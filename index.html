@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirecting...</title>
+<script>
+  // When magic link lands on http://localhost:3000/#access_token=... we redirect to the app and keep the hash
+  var target = 'ExpTracker-6.html' + (location.hash || '');
+  location.replace(target);
+</script>
+</head>
+<body>
+  <p>Redirecting to app...</p>
+</body>
+</html>
