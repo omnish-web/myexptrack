@@ -485,18 +485,33 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
 		</div>
         <div id="tab-budgets" class="view-section hidden w-full h-full p-2"><div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full"><div class="md:col-span-2 glass-panel p-5 flex flex-col h-full overflow-y-auto custom-scroll"><div class="flex justify-between items-center mb-4"><h3 class="text-base font-bold flex items-center gap-2"><i data-feather="pie-chart" class="text-purple-600 w-4 h-4"></i> Budgets</h3></div><div id="budgetContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div></div><div class="glass-panel p-5 flex flex-col h-fit"><h3 class="text-sm font-bold uppercase border-b pb-2 mb-3">Set Limits</h3><form onsubmit="handleSaveBudget(event)" class="space-y-3"><div><label class="compact-label">Category</label><select id="budgetCat" required class="compact-input"></select></div><div><label class="compact-label">Limit (₹)</label><input type="number" id="budgetLimit" required min="1" class="compact-input font-bold"></div><button type="submit" class="w-full bg-purple-600 text-white font-bold py-2 rounded text-xs">Set Budget</button></form></div></div></div>
         <div id="tab-settings" class="view-section hidden w-full h-full overflow-y-auto p-2">
-			<div class="glass-panel p-4 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-				<div>
-					<h3 class="font-bold text-sm uppercase flex items-center gap-2">
-						<i data-feather="database" class="w-4 h-4 text-blue-600"></i> Data Management
-					</h3>
-					<p class="text-xs text-gray-500 mt-1">Create a 'Snapshot' to archive old transactions and speed up the app.</p>
-				</div>
-				<button onclick="createServerSnapshot()" class="bg-gray-800 hover:bg-black dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg transition-all">
-					<i data-feather="save" class="w-4 h-4"></i> Close Books & Snapshot
-				</button>
-			</div>
-			
+            <div class="glass-panel p-4 mb-4">
+                <button type="button" onclick="toggleAdvancedSettings()" class="w-full flex items-center justify-between text-left font-bold text-sm uppercase text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg px-3 py-2 -mx-1 transition">
+                    <span class="flex items-center gap-2"><i data-feather="settings" class="w-4 h-4 text-gray-500"></i> Advanced Settings</span>
+                    <i data-feather="chevron-down" id="advancedSettingsChevron" class="w-4 h-4 text-gray-500 transition-transform duration-200"></i>
+                </button>
+                <div id="advancedSettingsContent" class="hidden mt-4 space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                        <div>
+                            <h4 class="font-bold text-xs uppercase text-gray-600 dark:text-gray-400 flex items-center gap-2"><i data-feather="database" class="w-3 h-3"></i> Data Management</h4>
+                            <p class="text-xs text-gray-500 mt-0.5">Create a Snapshot to archive old transactions and speed up the app.</p>
+                        </div>
+                        <button onclick="createServerSnapshot()" class="bg-gray-800 hover:bg-black dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow transition">
+                            <i data-feather="save" class="w-4 h-4"></i> Close Books & Snapshot
+                        </button>
+                    </div>
+                    <div class="p-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50/60 dark:bg-red-900/20">
+                        <h4 class="font-bold text-xs uppercase text-red-700 dark:text-red-300 flex items-center gap-2 mb-1"><i data-feather="alert-triangle" class="w-3 h-3"></i> Danger zone</h4>
+                        <p class="text-xs text-red-800/80 dark:text-red-200/80 mb-3">Use only if you are sure. There is no undo.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="promptResetCurrentYear()" class="bg-white text-red-700 border border-red-300 hover:bg-red-50 text-xs font-bold px-3 py-2 rounded-lg shadow-sm">Reset current year data</button>
+                            <button onclick="openRestoreBackupModal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-sm">Restore from backup</button>
+                            <button onclick="openFactoryResetModal()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow">Factory reset (everything)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-auto md:h-full">
 				<div class="glass-panel p-5 flex flex-col h-[500px] md:h-full">
 				<h3 class="font-bold mb-3 border-b pb-2 text-sm uppercase">Sources</h3>
@@ -540,6 +555,48 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
     <div class="flex justify-end gap-2">
       <button type="button" onclick="closeRenameModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
       <button type="button" onclick="confirmRenameModal()" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Rename</button>
+    </div>
+  </div>
+</div>
+<div id="factoryResetModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Factory reset</h3>
+    <p class="text-xs text-red-700 dark:text-red-300 mb-3 leading-relaxed">
+      This will permanently delete <span class="font-bold">all data</span> for this account (transactions, categories, sources, budgets, pending, schedules, snapshots).
+      There is <span class="font-bold">no undo</span>. You must confirm with your password.
+    </p>
+    <label class="compact-label">Password (for this account)</label>
+    <input type="password" id="factoryResetPassword" class="compact-input mb-3 text-sm" placeholder="Enter your password" autocomplete="current-password">
+    <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 mb-3">
+      <input type="checkbox" id="factoryResetBackup" class="rounded border-gray-400">
+      <span>Create a restore file (backup JSON) before resetting</span>
+    </label>
+    <p id="factoryResetError" class="text-xs text-red-600 dark:text-red-400 mb-2 hidden"></p>
+    <div class="flex justify-end gap-2 mt-2">
+      <button type="button" onclick="closeFactoryResetModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
+        Cancel
+      </button>
+      <button type="button" onclick="confirmFactoryReset()" class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition shadow-lg">
+        Delete everything
+      </button>
+    </div>
+  </div>
+</div>
+<div id="restoreBackupModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Restore from backup</h3>
+    <p class="text-xs text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
+      Select a backup JSON file. Restoring will replace your current data (transactions, categories, sources, budgets, pending, schedules, snapshot) with the file contents.
+    </p>
+    <input type="file" id="restoreBackupFile" accept="application/json" class="mb-3 text-xs text-gray-700 dark:text-gray-300">
+    <label id="restoreSyncSupabaseWrap" class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 mb-3 hidden">
+      <input type="checkbox" id="restoreSyncSupabase" class="rounded border-gray-400">
+      <span>Also sync to Supabase (replace cloud data with backup)</span>
+    </label>
+    <p id="restoreBackupError" class="text-xs text-red-600 dark:text-red-400 mb-2 hidden"></p>
+    <div class="flex justify-end gap-2 mt-2">
+      <button type="button" onclick="closeRestoreBackupModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
+      <button type="button" onclick="confirmRestoreBackup()" class="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition shadow-lg">Restore</button>
     </div>
   </div>
 </div>
@@ -672,6 +729,8 @@ function testSupabaseConnection() {
 // ==========================================
 let _supabaseClient = null;
 let supabaseUserId = null;
+let supabaseUserEmail = null;
+let currentRestoreBackupFile = null;
 
 function getSupabaseClient() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
@@ -750,6 +809,7 @@ function signInWithPassword() {
     }
     if (res.data && res.data.user) {
       supabaseUserId = res.data.user.id;
+      supabaseUserEmail = res.data.user.email || email;
       startAppWithSupabase();
     }
   }).catch(function(err) {
@@ -1189,6 +1249,180 @@ function deleteBudgetToSupabase(categoryKey) {
     if (res.error) return Promise.reject(new Error(res.error.message));
     return { success: true };
   });
+}
+
+function resetCurrentYearDataToSupabase(yearStr) {
+  var supabase = getSupabaseClient();
+  if (!supabase || !supabaseUserId) return Promise.reject(new Error('Not signed in'));
+  var start = yearStr + '-01-01';
+  var nextYear = String(Number(yearStr) + 1);
+  var end = nextYear + '-01-01';
+  // Delete expenses in that year
+  return supabase.from('expenses').delete()
+    .eq('user_id', supabaseUserId)
+    .gte('date', start)
+    .lt('date', end)
+    .then(function(r1) {
+      if (r1.error) return Promise.reject(new Error(r1.error.message));
+      // Delete budgets for that year
+      return supabase.from('budgets').delete()
+        .eq('user_id', supabaseUserId)
+        .like('category_key', '%#' + yearStr + '-%');
+    })
+    .then(function(r2) {
+      if (r2.error) return Promise.reject(new Error(r2.error.message));
+      // Delete pending transactions with expected_date in that year
+      return supabase.from('pending_transactions').delete()
+        .eq('user_id', supabaseUserId)
+        .gte('expected_date', start)
+        .lt('expected_date', end);
+    })
+    .then(function(r3) {
+      if (r3.error) return Promise.reject(new Error(r3.error.message));
+      return { success: true };
+    });
+}
+
+function resetAllDataToSupabase() {
+  var supabase = getSupabaseClient();
+  if (!supabase || !supabaseUserId) return Promise.reject(new Error('Not signed in'));
+  // Delete everything for this user across main tables
+  return supabase.from('expenses').delete().eq('user_id', supabaseUserId).then(function(r1) {
+    if (r1.error) return Promise.reject(new Error(r1.error.message));
+    return supabase.from('categories').delete().eq('user_id', supabaseUserId);
+  }).then(function(r2) {
+    if (r2.error) return Promise.reject(new Error(r2.error.message));
+    return supabase.from('sources').delete().eq('user_id', supabaseUserId);
+  }).then(function(r3) {
+    if (r3.error) return Promise.reject(new Error(r3.error.message));
+    return supabase.from('recurring').delete().eq('user_id', supabaseUserId);
+  }).then(function(r4) {
+    if (r4.error) return Promise.reject(new Error(r4.error.message));
+    return supabase.from('pending_transactions').delete().eq('user_id', supabaseUserId);
+  }).then(function(r5) {
+    if (r5.error) return Promise.reject(new Error(r5.error.message));
+    return supabase.from('budgets').delete().eq('user_id', supabaseUserId);
+  }).then(function(r6) {
+    if (r6.error) return Promise.reject(new Error(r6.error.message));
+    return supabase.from('balance_snapshots').delete().eq('user_id', supabaseUserId);
+  }).then(function(r7) {
+    if (r7.error) return Promise.reject(new Error(r7.error.message));
+    return { success: true };
+  });
+}
+
+function restoreBackupToSupabase(d) {
+  var supabase = getSupabaseClient();
+  if (!supabase || !supabaseUserId) return Promise.reject(new Error('Not signed in'));
+  var uid = supabaseUserId;
+  return resetAllDataToSupabase().then(function() {
+    var chain = Promise.resolve();
+    var cats = d.categories || {};
+    Object.keys(cats).forEach(function(parent) {
+      (cats[parent] || []).forEach(function(sub) {
+        chain = chain.then(function() {
+          return supabase.from('categories').insert({ user_id: uid, parent: parent, sub: String(sub) }).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+        });
+      });
+    });
+    return chain;
+  }).then(function() {
+    var sources = d.sources || [];
+    if (sources.length === 0) return Promise.resolve();
+    var rows = sources.map(function(s) {
+      var name = Array.isArray(s) ? s[0] : s;
+      var type = Array.isArray(s) ? (s[1] || 'Bank') : 'Bank';
+      var opening = Array.isArray(s) ? (Number(s[2]) || 0) : 0;
+      var stmt = Array.isArray(s) ? (s[3] || '') : '';
+      var due = Array.isArray(s) ? (s[4] || '') : '';
+      var link = Array.isArray(s) ? (s[5] || '') : '';
+      var fav = Array.isArray(s) ? !!s[6] : false;
+      var def = Array.isArray(s) ? !!s[7] : false;
+      return { user_id: uid, source_name: name, type: type, opening: opening, stmt: stmt, due: due, link: link, fav: fav, def: def };
+    });
+    return supabase.from('sources').insert(rows).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  }).then(function() {
+    var expenses = d.expenses || [];
+    if (expenses.length === 0) return Promise.resolve();
+    var rows = expenses.map(function(e) {
+      var id, date, type, sub, parent, amount, mode, source, remarks;
+      if (Array.isArray(e)) {
+        id = e[0]; date = e[1]; type = e[2] || ''; sub = e[3] || ''; parent = e[4] || ''; amount = Number(e[5]) || 0; mode = e[6] || ''; source = e[7] || ''; remarks = e[8] || '';
+      } else {
+        id = e.id; date = e.date; type = e.type || ''; sub = e.sub || ''; parent = e.parent || ''; amount = Number(e.amount) || 0; mode = e.mode || ''; source = e.source || ''; remarks = e.remarks || '';
+      }
+      return { id: id, user_id: uid, date: date, type: type, sub: sub, parent: parent, amount: amount, mode: mode, source: source, remarks: remarks };
+    });
+    return supabase.from('expenses').insert(rows).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  }).then(function() {
+    var scheduled = d.scheduled || [];
+    if (scheduled.length === 0) return Promise.resolve();
+    var rows = scheduled.map(function(s) {
+      var id, frequency, start_date, end_date, type, sub, parent, amount, mode, source, remarks;
+      if (Array.isArray(s)) {
+        id = s[0]; frequency = s[1] || ''; start_date = s[2]; end_date = s[3] || null; type = s[4] || ''; sub = s[5] || ''; parent = s[6] || ''; amount = Number(s[7]) || 0; mode = s[8] || ''; source = s[9] || ''; remarks = s[10] || '';
+      } else {
+        id = s.id; frequency = s.frequency || ''; start_date = s.start_date; end_date = s.end_date || null; type = s.type || ''; sub = s.sub || ''; parent = s.parent || ''; amount = Number(s.amount) || 0; mode = s.mode || ''; source = s.source || ''; remarks = s.remarks || '';
+      }
+      return { id: id, user_id: uid, frequency: frequency, start_date: start_date, end_date: end_date, type: type, sub: sub, parent: parent, amount: amount, mode: mode, source: source, remarks: remarks };
+    });
+    return supabase.from('recurring').insert(rows).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  }).then(function() {
+    var budgets = d.budgets || {};
+    var keys = Object.keys(budgets);
+    if (keys.length === 0) return Promise.resolve();
+    var rows = keys.map(function(category_key) { return { user_id: uid, category_key: category_key, limit_amount: Number(budgets[category_key]) || 0 }; });
+    return supabase.from('budgets').insert(rows).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  }).then(function() {
+    var pending = d.pending || [];
+    if (pending.length === 0) return Promise.resolve();
+    var rows = pending.map(function(p) {
+      var id = p.id || ('PEND-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      var expectedDate = p.expectedDate || p.expected_date || '';
+      return { id: id, user_id: uid, description: p.description || '', amount: Number(p.amount) || 0, expected_date: expectedDate, income_category: p.incomeCategory || p.income_category || '', income_sub_category: p.incomeSubCategory || p.income_sub_category || '', income_account: p.incomeAccount || p.income_account || '', transfer_account: p.transferAccount || p.transfer_account || '', transfer_category: p.transferCategory || p.transfer_category || '', transfer_sub_category: p.transferSubCategory || p.transfer_sub_category || '', status: 'Pending' };
+    });
+    return supabase.from('pending_transactions').insert(rows).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  }).then(function() {
+    var snap = d.snapshot;
+    if (!snap || !snap.date) return Promise.resolve();
+    var dateStr = typeof snap.date === 'string' ? snap.date : (snap.date && snap.date.toISOString ? snap.date.toISOString().split('T')[0] : '');
+    var balances = snap.balances || snap.balances_json || {};
+    if (!dateStr) return Promise.resolve();
+    return supabase.from('balance_snapshots').upsert({ user_id: uid, snapshot_date: dateStr, balances_json: balances, notes: 'User Generated' }, { onConflict: 'user_id,snapshot_date' }).then(function(r) { if (r.error) return Promise.reject(new Error(r.error.message)); return r; });
+  });
+}
+
+function downloadAppBackup() {
+  try {
+    var payload = {
+      exportedAt: new Date().toISOString(),
+      userId: supabaseUserId || null,
+      data: {
+        expenses: appData.expenses || [],
+        categories: appData.categories || {},
+        sources: appData.sources || [],
+        scheduled: appData.scheduled || [],
+        pending: appData.pending || [],
+        budgets: appData.budgets || {},
+        snapshot: appData.snapshot || null
+      }
+    };
+    var json = JSON.stringify(payload, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var ts = new Date().toISOString().replace(/[:.]/g, '-');
+    a.href = url;
+    a.download = 'reportpilot-backup-' + ts + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Backup file downloaded.');
+  } catch (e) {
+    console.error('Backup failed', e);
+    showToast('Failed to create backup file', 'error');
+  }
 }
 
 function saveBatchTransactionsToSupabase(entries) {
@@ -1639,11 +1873,24 @@ function handlePendingTransferSubInput(i) {
 }
 
 function loadPendingTransactions() {
+    // Render from appData.pending (single source of truth). This ensures restored backup data shows
+    // instead of being overwritten by a fresh Supabase fetch when opening the Pending tab.
     if (useSupabase()) {
-        getPendingTransactionsFromSupabase().then(renderPendingTable).catch(function(e) { showToast(e&&e.message?e.message:'Failed to load','error'); });
+        renderPendingTable(appData.pending || []);
     } else {
-        google.script.run.withSuccessHandler(renderPendingTable).getPendingTransactions();
+        google.script.run.withSuccessHandler(function(data) {
+            appData.pending = data || [];
+            renderPendingTable(appData.pending);
+        }).getPendingTransactions();
     }
+}
+
+function refreshPendingFromServer() {
+    if (!useSupabase()) return;
+    getPendingTransactionsFromSupabase().then(function(data) {
+        appData.pending = data || [];
+        renderPendingTable(appData.pending);
+    }).catch(function(e) { showToast(e && e.message ? e.message : 'Failed to load', 'error'); });
 }
 
 function renderPendingTable(data) {
@@ -1873,7 +2120,7 @@ function handlePendingSubmit(e) {
     function done(res) {
         showToast(res.message);
         resetPendingForm();
-        loadPendingTransactions();
+        if (useSupabase()) refreshPendingFromServer(); else loadPendingTransactions();
         btn.innerText = "Log Pending";
         btn.disabled = false;
     }
@@ -1895,7 +2142,7 @@ function handlePendingSubmit(e) {
 function deletePendingItem(id) {
     openConfirmModal("Remove this pending item permanently?", function() {
         if (useSupabase()) {
-            deletePendingTransactionToSupabase(id).then(function() { showToast("Deleted"); loadPendingTransactions(); }).catch(function(e) { showToast(e&&e.message?e.message:'Failed','error'); });
+            deletePendingTransactionToSupabase(id).then(function() { showToast("Deleted"); refreshPendingFromServer(); }).catch(function(e) { showToast(e&&e.message?e.message:'Failed','error'); });
         } else {
             google.script.run.withSuccessHandler(function() { showToast("Deleted"); loadPendingTransactions(); }).deletePendingTransaction(id);
         }
@@ -1977,7 +2224,7 @@ function submitApproval() {
     
     function onSuccess(res) {
         closeApproveModal();
-        loadPendingTransactions();
+        if (useSupabase()) refreshPendingFromServer(); else loadPendingTransactions();
         if (res.status === 'success') {
             showToast(res.message);
             if (useSupabase()) fetchInitialDataFromSupabase().then(function(data) { onDataLoad(JSON.stringify(data)); });
@@ -2030,6 +2277,22 @@ function selectParentForSub(parentName) {
     var sel = document.getElementById('selParentForSub');
     if (sel && appData.categories[parentName]) { sel.value = parentName; renderSettingsUI(); }
 }
+
+function toggleAdvancedSettings() {
+    var content = document.getElementById('advancedSettingsContent');
+    var chevron = document.getElementById('advancedSettingsChevron');
+    if (!content || !chevron) return;
+    var isHidden = content.classList.contains('hidden');
+    if (isHidden) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+        if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
+    } else {
+        content.classList.add('hidden');
+        chevron.style.transform = '';
+    }
+}
+
 var renameModalTarget = null;
 
 function openRenameModal(type, oldName, parent) {
@@ -2814,6 +3077,218 @@ function renderBulkRows() {
 
     handleBulkModeChange();
 }
+
+function promptResetCurrentYear() {
+    var year = new Date().getFullYear();
+    openConfirmModal(
+        "Reset data for " + year + "?",
+        function() {
+            var yearStr = String(year);
+            var s = appData.schema;
+            // Remove expenses from this year
+            appData.expenses = appData.expenses.filter(function(r) {
+                var d = String(r[s.date] || "");
+                return d.substr(0, 4) !== yearStr;
+            });
+            // Remove budgets for this year
+            Object.keys(appData.budgets || {}).forEach(function(key) {
+                if (key.indexOf("#" + yearStr + "-") !== -1) {
+                    delete appData.budgets[key];
+                }
+            });
+            // Remove pending items for this year
+            if (appData.pending) {
+                appData.pending = appData.pending.filter(function(item) {
+                    var d = String(item.expectedDate || "");
+                    return d.substr(0, 4) !== yearStr;
+                });
+            }
+            if (typeof buildSearchIndex === 'function') buildSearchIndex();
+            if (typeof calculateLiveBalances === 'function') calculateLiveBalances();
+            renderReportTable(true);
+            renderBudgetView();
+            if (typeof renderPendingTable === 'function') renderPendingTable(appData.pending || []);
+            if (useSupabase()) {
+                resetCurrentYearDataToSupabase(yearStr).catch(function(e) {
+                    showToast(e && e.message ? e.message : 'Failed to reset year on server', 'error');
+                });
+            }
+            showToast("Current year data reset.");
+        },
+        "Reset current year",
+        "Reset"
+    );
+}
+
+function promptFactoryReset() {
+    // Kept for backwards compatibility; now opens the dedicated modal.
+    openFactoryResetModal();
+}
+
+function openFactoryResetModal() {
+    var pw = document.getElementById('factoryResetPassword');
+    var cb = document.getElementById('factoryResetBackup');
+    var err = document.getElementById('factoryResetError');
+    if (pw) pw.value = '';
+    if (cb) cb.checked = true;
+    if (err) { err.textContent = ''; err.classList.add('hidden'); }
+    document.getElementById('factoryResetModal').classList.remove('hidden');
+}
+
+function closeFactoryResetModal() {
+    document.getElementById('factoryResetModal').classList.add('hidden');
+}
+
+function confirmFactoryReset() {
+    var pwEl = document.getElementById('factoryResetPassword');
+    var cb = document.getElementById('factoryResetBackup');
+    var err = document.getElementById('factoryResetError');
+    var btn = document.querySelector('#factoryResetModal button[onclick=\"confirmFactoryReset()\"]');
+    var password = (pwEl && pwEl.value) ? pwEl.value.trim() : '';
+    if (!password && useSupabase()) {
+        if (err) { err.textContent = 'Please enter your password.'; err.classList.remove('hidden'); }
+        return;
+    }
+    if (!useSupabase()) {
+        // No Supabase session (e.g. offline/legacy). Still respect backup option, then reset locally.
+        if (cb && cb.checked) downloadAppBackup();
+        performLocalFactoryReset();
+        closeFactoryResetModal();
+        return;
+    }
+    if (!supabaseUserEmail) {
+        if (err) { err.textContent = 'Cannot verify password: missing email. Please sign out and sign in again, then try.'; err.classList.remove('hidden'); }
+        return;
+    }
+    var supabase = getSupabaseClient();
+    if (!supabase) {
+        if (err) { err.textContent = 'Supabase client not available.'; err.classList.remove('hidden'); }
+        return;
+    }
+    if (btn) { btn.disabled = true; btn.textContent = 'Verifying...'; }
+    if (err) { err.classList.add('hidden'); err.textContent = ''; }
+    supabase.auth.signInWithPassword({ email: supabaseUserEmail, password: password }).then(function(res) {
+        if (res.error) {
+            if (err) { err.textContent = res.error.message || 'Password verification failed.'; err.classList.remove('hidden'); }
+            if (btn) { btn.disabled = false; btn.textContent = 'Delete everything'; }
+            return;
+        }
+        // Optional backup
+        if (cb && cb.checked) downloadAppBackup();
+        // Local + server reset
+        performLocalFactoryReset();
+        resetAllDataToSupabase().catch(function(e) {
+            showToast(e && e.message ? e.message : 'Failed to reset data on server', 'error');
+        });
+        closeFactoryResetModal();
+    }).catch(function(e) {
+        if (err) { err.textContent = e && e.message ? e.message : 'Password verification failed.'; err.classList.remove('hidden'); }
+    }).finally(function() {
+        if (btn) { btn.disabled = false; btn.textContent = 'Delete everything'; }
+    });
+}
+
+function performLocalFactoryReset() {
+    // Clear local data
+    appData.expenses = [];
+    appData.categories = {};
+    appData.sources = [];
+    appData.scheduled = [];
+    appData.pending = [];
+    appData.budgets = {};
+    appData.snapshot = null;
+    if (typeof buildSearchIndex === 'function') buildSearchIndex();
+    if (typeof calculateLiveBalances === 'function') calculateLiveBalances();
+    renderReportTable(true);
+    if (typeof renderScheduledTable === 'function') renderScheduledTable();
+    if (typeof renderPendingTable === 'function') renderPendingTable([]);
+    renderBudgetView();
+    populateFilterDropdowns();
+    renderSettingsUI();
+    if (typeof renderDashboard === 'function') renderDashboard();
+    showToast('All data cleared for this account.');
+}
+
+function openRestoreBackupModal() {
+    currentRestoreBackupFile = null;
+    var input = document.getElementById('restoreBackupFile');
+    var err = document.getElementById('restoreBackupError');
+    var syncWrap = document.getElementById('restoreSyncSupabaseWrap');
+    var syncCb = document.getElementById('restoreSyncSupabase');
+    if (input) input.value = '';
+    if (err) { err.textContent = ''; err.classList.add('hidden'); }
+    if (syncWrap) {
+        if (useSupabase()) { syncWrap.classList.remove('hidden'); if (syncCb) syncCb.checked = false; }
+        else syncWrap.classList.add('hidden');
+    }
+    document.getElementById('restoreBackupModal').classList.remove('hidden');
+}
+
+function closeRestoreBackupModal() {
+    document.getElementById('restoreBackupModal').classList.add('hidden');
+}
+
+function confirmRestoreBackup() {
+    var input = document.getElementById('restoreBackupFile');
+    var err = document.getElementById('restoreBackupError');
+    if (!input || !input.files || !input.files[0]) {
+        if (err) { err.textContent = 'Please choose a backup JSON file.'; err.classList.remove('hidden'); }
+        return;
+    }
+    var file = input.files[0];
+    if (file.type && file.type.indexOf('json') === -1) {
+        if (err) { err.textContent = 'File must be a JSON backup.'; err.classList.remove('hidden'); }
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            var parsed = JSON.parse(ev.target.result || '{}');
+            if (!parsed || !parsed.data) throw new Error('Invalid backup format.');
+            var d = parsed.data;
+            // Basic shape validation
+            if (!d.expenses || !d.categories || !d.sources || !d.budgets) {
+                throw new Error('Backup is missing required sections.');
+            }
+            appData.expenses = Array.isArray(d.expenses) ? d.expenses : [];
+            appData.categories = d.categories || {};
+            appData.sources = Array.isArray(d.sources) ? d.sources : [];
+            appData.scheduled = Array.isArray(d.scheduled) ? d.scheduled : [];
+            appData.pending = Array.isArray(d.pending) ? d.pending : [];
+            appData.budgets = d.budgets || {};
+            appData.snapshot = d.snapshot || null;
+            if (typeof buildSearchIndex === 'function') buildSearchIndex();
+            if (typeof calculateLiveBalances === 'function') calculateLiveBalances();
+            renderReportTable(true);
+            if (typeof renderScheduledTable === 'function') renderScheduledTable();
+            if (typeof renderPendingTable === 'function') renderPendingTable(appData.pending || []);
+            renderBudgetView();
+            populateFilterDropdowns();
+            renderSettingsUI();
+            if (typeof renderDashboard === 'function') renderDashboard();
+            var syncToSupabase = useSupabase() && document.getElementById('restoreSyncSupabase') && document.getElementById('restoreSyncSupabase').checked;
+            if (syncToSupabase) {
+                restoreBackupToSupabase(d).then(function() {
+                    closeRestoreBackupModal();
+                    showToast('Backup restored (local and Supabase).');
+                }).catch(function(e) {
+                    if (err) { err.textContent = e && e.message ? e.message : 'Supabase sync failed.'; err.classList.remove('hidden'); }
+                    showToast('Local restore done; Supabase sync failed.', 'error');
+                });
+            } else {
+                closeRestoreBackupModal();
+                showToast('Backup restored (local data).');
+            }
+        } catch (e) {
+            console.error('Restore failed', e);
+            if (err) { err.textContent = e && e.message ? e.message : 'Failed to restore backup.'; err.classList.remove('hidden'); }
+        }
+    };
+    reader.onerror = function() {
+        if (err) { err.textContent = 'Failed to read backup file.'; err.classList.remove('hidden'); }
+    };
+    reader.readAsText(file);
+}
 function handleBulkModeChange(){const mode=document.getElementById('bulkMode').value;document.querySelectorAll('.bulk-source').forEach(sel=>{const val=sel.value;sel.innerHTML='<option value="">Use Global Source</option>';if(appData.sources){appData.sources.forEach(s=>{const n=Array.isArray(s)?s[0]:s;const type=Array.isArray(s)?(s[1]||'Bank'):'Bank';if(mode==='Cash'){if(type==='Cash')sel.innerHTML+=`<option value="${n}">${n}</option>`;}else{if(type!=='Cash')sel.innerHTML+=`<option value="${n}">${n}</option>`;}});if(val&&Array.from(sel.options).some(o=>o.value===val))sel.value=val;else sel.value='';}});}
 function handleBulkSubmit(e) {
     e.preventDefault();
@@ -3534,11 +4009,13 @@ document.addEventListener('DOMContentLoaded',()=>{
                 var session = result.data && result.data.session;
                 if (session && session.user && isRecoveryRedirect) {
                     supabaseUserId = session.user.id;
+                    supabaseUserEmail = session.user.email || supabaseUserEmail;
                     showSetNewPasswordUI();
                     return;
                 }
                 if (session && session.user) {
                     supabaseUserId = session.user.id;
+                    supabaseUserEmail = session.user.email || supabaseUserEmail;
                     startAppWithSupabase();
                     return;
                 }
@@ -3549,17 +4026,20 @@ document.addEventListener('DOMContentLoaded',()=>{
                         var s2 = r2.data && r2.data.session;
                         if (s2 && s2.user && isRecoveryRedirect) {
                             supabaseUserId = s2.user.id;
+                            supabaseUserEmail = s2.user.email || supabaseUserEmail;
                             showSetNewPasswordUI();
                             return;
                         }
                         if (s2 && s2.user) {
                             supabaseUserId = s2.user.id;
+                            supabaseUserEmail = s2.user.email || supabaseUserEmail;
                             startAppWithSupabase();
                         } else {
                             showSignInUI();
                             supabase.auth.onAuthStateChange(function(event, payload) {
                                 if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
                                     supabaseUserId = payload.session.user.id;
+                                    supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
                                     startAppWithSupabase();
                                 }
                             });
