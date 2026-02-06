@@ -52,7 +52,7 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
       <!-- Forgot password: request reset link -->
       <div id="forgotPasswordBox" class="hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
         <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-2">Reset password</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Enter your email and we'll send a link to set a new password.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Enter your email and we’ll send a link to set a new password.</p>
         <input type="email" id="resetEmail" placeholder="you@example.com" class="compact-input mb-2 text-sm w-full">
         <div class="flex gap-2">
           <button type="button" id="sendResetLinkBtn" onclick="sendPasswordResetLink()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded text-sm transition">Send reset link</button>
@@ -81,9 +81,7 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
             <div class="flex gap-3 overflow-x-auto px-2 custom-scroll min-w-0" id="balanceTicker"></div>
         </div>
         <div class="flex items-center gap-3">
-            <span id="lastSyncedIndicator" class="hidden text-[10px] text-gray-500 dark:text-gray-400 font-normal" title="Last saved to cloud"></span>
             <button id="signOutBtn" onclick="signOutSupabase()" class="hidden text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded" title="Sign out">Sign out</button>
-            <button type="button" onclick="openShortcutHelpModal()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" title="Keyboard shortcuts"><i data-feather="help-circle" class="w-4 h-4 text-gray-500 dark:text-gray-400"></i></button>
             <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"><i data-feather="moon" class="w-4 h-4 hidden dark:block"></i><i data-feather="sun" class="w-4 h-4 block dark:hidden"></i></button>
             <div class="bg-gray-200/50 dark:bg-gray-700/50 p-1 rounded-lg flex text-xs font-semibold backdrop-blur-sm flex-shrink-0 overflow-x-auto">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item px-4 py-1.5 rounded-md">Dashboard</button>
@@ -163,8 +161,6 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
             </div>
         </div>
 		<div id="tab-dashboard" class="view-section hidden w-full h-full overflow-y-auto p-2">
-			<div id="dashboardBudgetAlerts" class="mb-4 empty:hidden"></div>
-			<div id="dashboardBudgetWidgets" class="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 empty:hidden"></div>
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
 				<div class="glass-panel p-5 flex flex-col min-h-[400px]">
 					<h3 class="text-sm font-bold uppercase mb-4 flex items-center gap-2">
@@ -199,7 +195,6 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
                             <div><label class="compact-label">Amount (₹)</label><input type="number" id="pendAmount" step="0.01" required class="compact-input font-bold" oninput="validatePendingSplits()"></div>
                             <div><label class="compact-label">Expected Date</label><input type="date" id="pendDate" required class="compact-input"></div>
                         </div>
-                        <div><label class="compact-label">Remind me on (optional)</label><input type="date" id="pendRemindDate" class="compact-input text-xs" title="Optional reminder date"></div>
                         <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded border border-green-100 dark:border-green-800">
                             <h4 class="text-[10px] font-bold text-green-700 mb-2 uppercase">1. Incoming (Income Category)</h4>
                             <div class="grid grid-cols-2 gap-2 mb-2">
@@ -222,16 +217,7 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
                 <div class="lg:col-span-8 glass-panel p-5 flex flex-col h-full">
                     <div id="pendingStatsBar" class="grid grid-cols-3 gap-3 mb-5 shrink-0"></div>
 					<div id="pendingInflowSummary" class="mb-5 flex flex-wrap gap-2 shrink-0 empty:hidden"></div>
-					<div class="flex justify-between items-center mb-3 flex-wrap gap-2">
-						<h3 class="text-base font-bold">Due Payments</h3>
-						<div class="flex items-center gap-2">
-							<label class="text-[10px] text-gray-500 font-bold uppercase">Sort</label>
-							<select id="pendingSortOrder" onchange="loadPendingTransactions()" class="compact-input text-xs w-36 py-1">
-								<option value="overdue">Overdue first</option>
-								<option value="date">By expected date</option>
-							</select>
-						</div>
-					</div>
+					<h3 class="text-base font-bold mb-3">Due Payments</h3>
                     <div class="flex-1 overflow-y-auto custom-scroll rounded-lg border bg-white/50 dark:bg-gray-800/50">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-gray-100 dark:bg-gray-700 sticky top-0 z-10 text-gray-600 dark:text-gray-300 font-bold uppercase">
@@ -384,7 +370,7 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
 					</div>
 					<div class="space-y-2">
 					<div id="activeFilterBadges" class="flex flex-wrap gap-1 mb-2"></div>
-					<button onclick="resetFilters()" class="text-[9px] text-red-600 hover:underline mb-2 hidden" id="clearAllBtn">Clear All Filters x</button>
+					<button onclick="resetFilters()" class="text-[9px] text-red-600 hover:underline mb-2 hidden" id="clearAllBtn">Clear All Filters ×</button>
 					<div class="flex gap-2 mb-2 overflow-x-auto pb-1">
 						<div id="quickFilterContainer" class="flex gap-2"></div>
 					</div>
@@ -439,7 +425,7 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
 						<div class="clear-btn" onclick="clearInput('filterSource')"><i data-feather="x" class="w-3 h-3"></i></div>
 						</div>
 					</div>
-					<div><label class="compact-label">Search in results</label><input type="text" id="reportSearch" placeholder="Remarks, category, source..." class="compact-input text-xs"></div>
+					<input type="text" id="reportSearch" placeholder="Search..." class="compact-input text-xs">
 					<div class="flex gap-2 mt-2">
 						<button onclick="renderReportTable(true)" id="btnApplyFilter" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-xs transition-colors flex justify-center items-center gap-2"><i data-feather="filter" class="w-3 h-3"></i> <span>Apply</span> <span id="filterMatchCount" class="opacity-75 font-normal"></span></button>
 						<button onclick="exportReportToCSV()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded text-xs transition-colors flex justify-center items-center gap-2"><i data-feather="download" class="w-3 h-3"></i> CSV</button>
@@ -469,25 +455,12 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
 					<h4 class="text-[10px] font-bold text-gray-500 mb-1">Categories</h4>
 					<div id="categoryBreakdown" class="space-y-3"></div>
 					</div>
-					<div id="reportBudgetVsSpent" class="hidden mt-3 p-2 rounded bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800">
-						<h4 class="text-[10px] font-bold text-purple-700 dark:text-purple-300 mb-1">Budget vs Spent (this month)</h4>
-						<div id="reportBudgetVsSpentList" class="space-y-1 text-xs"></div>
-					</div>
 				</div>
 				</div>
 				<div class="lg:col-span-8 relative w-full h-full min-h-[500px]">
 				<div class="absolute inset-0 glass-panel p-0 flex flex-col overflow-hidden">
-					<div class="p-5 flex flex-wrap justify-between items-center gap-2 border-b">
-					<h3 class="text-sm font-bold uppercase">Log</h3>
-					<div class="flex items-center gap-2">
-						<span class="text-xs font-bold text-gray-500">Rows: <span id="reportCount" class="text-blue-600">0</span></span>
-						<button type="button" onclick="toggleReportChart()" class="px-2 py-1 text-xs font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-800/50 flex items-center gap-1"><i data-feather="bar-chart-2" class="w-3 h-3"></i> Chart</button>
-						<button type="button" onclick="printReport()" class="px-2 py-1 text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center gap-1"><i data-feather="printer" class="w-3 h-3"></i> Print</button>
-					</div>
-					</div>
-					<div id="reportChartPanel" class="hidden mx-5 mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-						<div class="flex justify-between items-center mb-2"><h4 class="text-xs font-bold uppercase text-gray-600 dark:text-gray-400">Filtered data by category</h4><button type="button" onclick="toggleReportChart()" class="text-xs text-gray-500 hover:text-gray-700">Close</button></div>
-						<div class="h-64 relative"><canvas id="reportFilterChart"></canvas></div>
+					<div class="p-5 flex justify-between items-center border-b">
+					<h3 class="text-sm font-bold uppercase">Log</h3><span class="text-xs font-bold text-gray-500">Rows: <span id="reportCount" class="text-blue-600">0</span></span>
 					</div>
 					<div id="reportScrollContainer" class="flex-1 overflow-y-auto custom-scroll p-5 pt-0">
 					<table class="w-full text-left text-xs mt-4">
@@ -640,45 +613,6 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
     </div>
   </div>
 </div>
-<div id="createOnceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
-  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 border border-gray-200 dark:border-gray-700 relative">
-    <h3 class="text-lg font-bold mb-2 dark:text-white">Create One-Off from Schedule</h3>
-    <p class="text-xs text-gray-500 mb-3">Add a single transaction for the chosen date. Schedule is unchanged.</p>
-    <label class="compact-label">Transaction Date</label><input type="date" id="createOnceDate" class="compact-input mb-4">
-    <div class="flex justify-between gap-2">
-      <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded text-sm" onclick="closeCreateOnceModal()">Cancel</button>
-      <button id="btnCreateOnceConfirm" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded text-sm" onclick="confirmCreateOnce()">Create</button>
-    </div>
-  </div>
-</div>
-<div id="partialReceiveModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
-  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 relative">
-    <h3 class="text-lg font-bold mb-2 dark:text-white">Partial Receive</h3>
-    <p class="text-xs text-gray-500 mb-2">Record amount received now. Pending balance will be reduced.</p>
-    <p id="partialReceiveMaxHint" class="text-xs font-mono text-amber-600 dark:text-amber-400 mb-3">Max: ₹0</p>
-    <label class="compact-label">Amount Received (₹)</label><input type="number" id="partialReceiveAmount" step="0.01" min="0.01" class="compact-input mb-2 font-bold" placeholder="0" oninput="validatePartialSplits(); updatePartialConfirmButton();">
-    <label class="compact-label">Date Received</label><input type="date" id="partialReceiveDate" class="compact-input mb-3">
-    <div id="partialPlannedSection" class="hidden mb-3 p-2 bg-gray-100 dark:bg-gray-700/50 rounded border border-gray-200 dark:border-gray-600">
-      <p class="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Planned Destinations (original)</p>
-      <p id="partialPlannedDestList" class="text-[10px] text-gray-700 dark:text-gray-300 font-mono"></p>
-    </div>
-    <div id="partialDestSection" class="mb-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-      <p id="partialDestLabel" class="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase mb-2">Where to send this partial payment? (optional)</p>
-      <p id="partialDestHint" class="text-[10px] text-gray-500 dark:text-gray-400 mb-2 hidden"></p>
-      <div id="partialSplitList" class="space-y-2 mb-2"></div>
-      <div class="flex flex-wrap items-center gap-2 mb-2">
-        <button type="button" onclick="addPartialDestRow()" class="text-[10px] bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 px-2 py-1 rounded">+ Dest</button>
-        <button type="button" id="btnPartialAutoSplit" onclick="applyPartialAutoSplit()" class="hidden text-[10px] bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">Auto-Split Proportional</button>
-        <span id="partialSplitTotal" class="text-[10px] text-gray-500 dark:text-gray-400 font-mono">Allocated: ₹0</span>
-      </div>
-    </div>
-    <p id="partialReceiveError" class="text-xs text-red-600 dark:text-red-400 mb-2 hidden"></p>
-    <div class="flex justify-between gap-2">
-      <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded text-sm" onclick="closePartialReceiveModal()">Cancel</button>
-      <button id="btnPartialConfirm" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" onclick="confirmPartialReceive()">Record Partial</button>
-    </div>
-  </div>
-</div>
 <div id="confirmModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 hidden backdrop-blur-sm transition-opacity">
   <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-80 border border-gray-200 dark:border-gray-700 text-center transform transition-all scale-100">
     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
@@ -690,29 +624,6 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
       <button onclick="closeConfirmModal()" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg text-xs font-bold transition">Cancel</button>
       <button onclick="executeConfirmAction()" id="btnConfirmAction" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition shadow-lg">Delete</button>
     </div>
-  </div>
-</div>
-<div id="shortcutHelpModal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 hidden backdrop-blur-sm">
-  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-80 border border-gray-200 dark:border-gray-700">
-    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><i data-feather="command" class="w-5 h-5"></i> Keyboard shortcuts</h3>
-    <ul class="text-sm space-y-2 text-gray-700 dark:text-gray-300">
-      <li class="flex justify-between gap-4"><kbd class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+S</kbd><span>Save (Entry form)</span></li>
-      <li class="flex justify-between gap-4"><kbd class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+N</kbd><span>New entry</span></li>
-      <li class="flex justify-between gap-4"><kbd class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+E</kbd><span>Go to Entry</span></li>
-      <li class="flex justify-between gap-4"><kbd class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+R</kbd><span>Go to Reports</span></li>
-      <li class="flex justify-between gap-4"><kbd class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+K</kbd><span>Search transactions</span></li>
-    </ul>
-    <p class="text-xs text-gray-500 mt-4">Mac: use <kbd class="px-1 bg-gray-100 dark:bg-gray-700 rounded">Cmd</kbd> instead of Ctrl</p>
-    <button type="button" onclick="closeShortcutHelpModal()" class="mt-4 w-full py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded text-sm font-bold transition">Close</button>
-  </div>
-</div>
-<div id="globalSearchOverlay" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 hidden backdrop-blur-sm">
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 border border-gray-200 dark:border-gray-700 overflow-hidden">
-    <div class="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
-      <i data-feather="search" class="w-5 h-5 text-gray-500"></i>
-      <input type="text" id="globalSearchInput" placeholder="Search by remarks, category, amount, date..." class="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 text-sm" oninput="runGlobalSearch(this.value)" onkeydown="handleGlobalSearchKeydown(event)">
-    </div>
-    <div id="globalSearchResults" class="max-h-72 overflow-y-auto custom-scroll p-2 text-sm"></div>
   </div>
 </div>
 <div id="bulkActionBar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 z-50 transition-all duration-300 translate-y-20 opacity-0">
@@ -775,9 +686,11 @@ body{background:var(--bg-image) no-repeat center center fixed;background-size:co
     </div>
 </div>
 <script>
-// SUPABASE CONFIG - Paste your keys here
+// ==========================================
+// SUPABASE CONFIG (Phase 2) - Paste your keys here
+// ==========================================
 const SUPABASE_URL = 'https://juzrdkojjglqideclnzw.supabase.co';      // e.g. https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1enJka29qamdscWlkZWNsbnp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ4NjgsImV4cCI6MjA4NTY2MDg2OH0.akDH0O00QOddHemJw9ZSGkYSwbKBC9sPiBNZjMT5Q9M'; // Project Settings -> API -> anon public
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1enJka29qamdscWlkZWNsbnp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ4NjgsImV4cCI6MjA4NTY2MDg2OH0.akDH0O00QOddHemJw9ZSGkYSwbKBC9sPiBNZjMT5Q9M'; // long string from Project Settings → API → anon public
 
 function testSupabaseConnection() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -1049,7 +962,7 @@ function fetchInitialDataFromSupabase() {
 
   function fmtDate(d) { return d ? String(d).split('T')[0] : ''; }
 
-  return supabase.from('balance_snapshots').select('snapshot_date, balances_json').eq('user_id', uid).order('snapshot_date', { ascending: false }).limit(1).maybeSingle()
+  return supabase.from('balance_snapshots').select('snapshot_date, balances_json').eq('user_id', uid).order('snapshot_date', { ascending: false }).limit(1).single()
     .then(function(snapRes) {
       var cutoff = new Date('2000-01-01');
       if (snapRes.data && snapRes.data.snapshot_date) {
@@ -1099,7 +1012,6 @@ function startAppWithSupabase() {
   document.getElementById('splash-status').textContent = 'Loading your data...';
   fetchInitialDataFromSupabase().then(function(data) {
     onDataLoad(JSON.stringify(data));
-    if (typeof updateLastSyncedIndicator === 'function') updateLastSyncedIndicator();
   }).catch(function(err) {
     document.getElementById('errorMsg').textContent = err && err.message ? err.message : 'Failed to load data';
     document.getElementById('errorBox').classList.remove('hidden');
@@ -1120,12 +1032,12 @@ function saveTransactionToSupabase(d) {
   var id = d.transactionId || ('TXN-' + new Date().getTime());
   var row = { id: id, user_id: supabaseUserId, date: d.date, type: d.type, sub: d.subCategory || '', parent: d.parentCategory || '', amount: Number(d.amount), mode: d.mode || 'Cashless', source: src, remarks: d.remarks || '' };
   if (d.transactionId) {
-    return supabase.from('expenses').update({ date: row.date, type: row.type, sub: row.sub, parent: row.parent, amount: row.amount, mode: row.mode, source: row.source, remarks: row.remarks }).eq('user_id', supabaseUserId).eq('id', id).then(function(res) {
+    return supabase.from('expenses').update({ date: row.date, type: row.type, sub: row.sub, parent: row.parent, amount: row.amount, mode: row.mode, source: row.source, remarks: row.remarks }).eq('user_id', supabaseUserId).eq('id', id).select().single().then(function(res) {
       if (res.error) return Promise.reject(new Error(res.error.message));
       return { success: true, savedId: id };
     });
   }
-  return supabase.from('expenses').insert(row).then(function(res) {
+  return supabase.from('expenses').insert(row).select().single().then(function(res) {
     if (res.error) return Promise.reject(new Error(res.error.message));
     return { success: true, savedId: id };
   });
@@ -1672,103 +1584,39 @@ function forceLoadApp(){
 function handleShortcuts(e) {
     if (e.ctrlKey || e.metaKey) {
         switch (e.key.toLowerCase()) {
-            case 'k':
-                e.preventDefault();
-                openGlobalSearch();
-                break;
             case 's':
                 e.preventDefault();
-                if (document.getElementById('globalSearchOverlay') && !document.getElementById('globalSearchOverlay').classList.contains('hidden')) return;
-                if (document.getElementById('shortcutHelpModal') && !document.getElementById('shortcutHelpModal').classList.contains('hidden')) return;
+                // Check if we are on the Entry Tab
                 if (!document.getElementById('tab-entry').classList.contains('hidden')) {
                     const isBulkMode = !document.getElementById('container-bulk').classList.contains('hidden');
-                    if (isBulkMode) document.getElementById('bulkForm').requestSubmit();
-                    else document.getElementById('txnForm').requestSubmit();
+                    
+                    if (isBulkMode) {
+                        // Submit Bulk Form
+                        document.getElementById('bulkForm').requestSubmit();
+                    } else {
+                        // Submit Single Form
+                        document.getElementById('txnForm').requestSubmit();
+                    }
                 }
                 break;
+
             case 'n':
                 e.preventDefault();
                 resetForm();
                 switchTab('entry');
                 break;
+
             case 'r':
                 e.preventDefault();
                 switchTab('reports');
                 break;
+
             case 'e':
                 e.preventDefault();
                 switchTab('entry');
                 break;
         }
     }
-}
-
-var lastSyncedAt = null;
-function updateLastSyncedIndicator() {
-    lastSyncedAt = Date.now();
-    var el = document.getElementById('lastSyncedIndicator');
-    if (!el || !useSupabase()) return;
-    el.classList.remove('hidden');
-    el.textContent = 'Synced just now';
-    setTimeout(function() {
-        if (!lastSyncedAt) return;
-        var mins = Math.floor((Date.now() - lastSyncedAt) / 60000);
-        if (el) el.textContent = mins < 1 ? 'Synced just now' : (mins === 1 ? 'Synced 1 min ago' : 'Synced ' + mins + ' min ago');
-    }, 60000);
-}
-
-function openShortcutHelpModal() {
-    document.getElementById('shortcutHelpModal').classList.remove('hidden');
-    if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
-}
-function closeShortcutHelpModal() {
-    document.getElementById('shortcutHelpModal').classList.add('hidden');
-}
-
-var globalSearchDebounce = null;
-function openGlobalSearch() {
-    document.getElementById('globalSearchOverlay').classList.remove('hidden');
-    document.getElementById('globalSearchInput').value = '';
-    document.getElementById('globalSearchResults').innerHTML = '<p class="p-3 text-gray-500 text-xs">Type to search transactions by remarks, category, amount, or date.</p>';
-    document.getElementById('globalSearchInput').focus();
-    if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
-}
-function closeGlobalSearch() {
-    document.getElementById('globalSearchOverlay').classList.add('hidden');
-}
-function runGlobalSearch(q) {
-    q = (q || '').trim().toLowerCase();
-    var list = document.getElementById('globalSearchResults');
-    if (!q || q.length < 2) {
-        list.innerHTML = '<p class="p-3 text-gray-500 text-xs">Type at least 2 characters.</p>';
-        return;
-    }
-    var s = appData.schema;
-    var matches = appData.expenses.filter(function(r) {
-        var txt = [r[s.date], r[s.type], r[s.parent], r[s.sub], r[s.remarks], r[s.source], String(r[s.amt])].join(' ').toLowerCase();
-        return txt.indexOf(q) !== -1;
-    }).slice(0, 20);
-    if (matches.length === 0) {
-        list.innerHTML = '<p class="p-3 text-gray-500 text-xs">No matches.</p>';
-        return;
-    }
-    list.innerHTML = matches.map(function(r) {
-        var id = r[s.id];
-        var date = r[s.date];
-        var type = r[s.type];
-        var sub = r[s.sub];
-        var amt = r[s.amt];
-        var remarks = (r[s.remarks] || '').slice(0, 30);
-        return '<button type="button" onclick="selectGlobalSearchResult(\'' + id.replace(/'/g, "\\'") + '\')" class="w-full text-left px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-between items-center gap-2"><span class="truncate text-gray-800 dark:text-gray-200">' + date + ' · ' + sub + ' · ₹' + Number(amt).toLocaleString('en-IN') + '</span><span class="text-[10px] text-gray-500">' + type + '</span></button>';
-    }).join('');
-}
-function handleGlobalSearchKeydown(e) {
-    if (e.key === 'Escape') closeGlobalSearch();
-}
-function selectGlobalSearchResult(id) {
-    closeGlobalSearch();
-    switchTab('reports');
-    setTimeout(function() { renderReportTable(false); if (typeof editTxn === 'function') editTxn(id); }, 100);
 }
 
 function setDateFilter(m) {
@@ -1876,15 +1724,8 @@ function onDataLoad(json) {
             if (so) so.classList.remove('hidden');
         }
     } catch (e) {
-        console.error('onDataLoad error', e);
-        var errEl = document.getElementById('errorMsg');
-        var box = document.getElementById('errorBox');
-        if (errEl) errEl.innerText = "Data load error: " + (e && e.message ? e.message : String(e));
-        if (box) box.classList.remove('hidden');
-        document.getElementById('splash').classList.add('hidden');
-        document.getElementById('splash-spinner').classList.add('hidden');
-        var forceBtn = document.getElementById('forceLoadBtn');
-        if (forceBtn) forceBtn.classList.remove('hidden');
+        document.getElementById('errorMsg').innerText = "Data Parse Error: " + e.message;
+        document.getElementById('errorBox').classList.remove('hidden');
     }
 }
 
@@ -2078,19 +1919,7 @@ function renderPendingTable(data) {
         return;
     }
 
-    var order = (document.getElementById('pendingSortOrder') && document.getElementById('pendingSortOrder').value) || 'overdue';
-    var sorted = data.slice().sort(function(a, b) {
-        var ad = a.expectedDate || '', bd = b.expectedDate || '';
-        var aOver = ad < todayStr, bOver = bd < todayStr;
-        if (order === 'overdue') {
-            if (aOver && !bOver) return -1;
-            if (!aOver && bOver) return 1;
-            return ad.localeCompare(bd);
-        }
-        return ad.localeCompare(bd);
-    });
-
-    sorted.forEach(item => {
+    data.forEach(item => {
         pendingItemsMap[item.id] = item;
         const amt = parseFloat(item.amount) || 0;
         
@@ -2131,25 +1960,22 @@ function renderPendingTable(data) {
 
         // 3. Render Table Row (Existing Logic)
         const isOverdue = item.expectedDate < todayStr;
-        const dateClass = isOverdue ? 'status-overdue font-bold' : 'text-gray-700 dark:text-gray-300';
-        const rowBg = isOverdue ? 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500' : '';
+        const dateClass = isOverdue ? 'status-overdue' : 'text-gray-700 dark:text-gray-300';
         let flowStr = `${item.incomeAccount}`;
         if (item.transferAccount && item.transferAccount.startsWith('[')) {
             flowStr += ` &#8594; ${JSON.parse(item.transferAccount).length} Splits`;
         } else if (item.transferAccount) {
             flowStr += ` &#8594; ${item.transferAccount}`;
         }
-        const overdueBadge = isOverdue ? '<span class="ml-1 text-[9px] bg-red-500 text-white px-1.5 py-0.5 rounded uppercase font-bold">Overdue</span>' : '';
 
         tbody.innerHTML += `
-        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition ${rowBg}">
-          <td class="p-3 font-medium ${dateClass}">${item.expectedDate}${overdueBadge}</td>
+        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+          <td class="p-3 font-medium ${dateClass}">${item.expectedDate}</td>
           <td class="p-3 font-semibold text-gray-800 dark:text-gray-200">${item.description}</td>
           <td class="p-3 font-mono font-bold text-gray-800 dark:text-gray-100">₹${Number(item.amount).toLocaleString('en-IN')}</td>
           <td class="p-3 text-xs text-gray-500"><small>${flowStr}</small></td>
-          <td class="p-3 flex flex-wrap gap-1 justify-center">
-            <button onclick="initiateApprove('${item.id}')" class="text-green-600 hover:text-green-800 p-1 bg-green-50 dark:bg-green-900/30 rounded" title="Full receive"><i data-feather="check-circle" class="w-4 h-4"></i></button>
-            <button onclick="openPartialReceiveModal('${item.id}')" class="text-amber-600 hover:text-amber-800 p-1 bg-amber-50 dark:bg-amber-900/30 rounded" title="Partial receive"><i data-feather="percent" class="w-4 h-4"></i></button>
+          <td class="p-3 flex gap-2 justify-center">
+            <button onclick="initiateApprove('${item.id}')" class="text-green-600 hover:text-green-800 p-1 bg-green-50 dark:bg-green-900/30 rounded"><i data-feather="check-circle" class="w-4 h-4"></i></button>
             <button onclick="initiateEdit('${item.id}')" class="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 dark:bg-blue-900/30 rounded"><i data-feather="edit-2" class="w-4 h-4"></i></button>
             <button onclick="deletePendingItem('${item.id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded"><i data-feather="trash-2" class="w-4 h-4"></i></button>
           </td>
@@ -2379,307 +2205,6 @@ function initiateApprove(id) {
 function closeApproveModal() {
     document.getElementById('approveModal').classList.add('hidden');
     currentPendingItem = null;
-}
-
-var partialReceiveRequiresDestinations = false;
-
-function applyPartialAutoSplit() {
-    if (!currentPendingItem) return;
-    var trf = currentPendingItem.transferAccount;
-    if (!trf || trf.indexOf('[') !== 0) return;
-    var received = parseFloat(document.getElementById('partialReceiveAmount').value) || 0;
-    if (received <= 0) return showToast('Enter amount received first', 'error');
-    var fullAmt = parseFloat(currentPendingItem.amount) || 0;
-    if (fullAmt <= 0) return;
-    var splits;
-    try { splits = JSON.parse(trf); } catch (e) { return; }
-    if (!splits || !splits.length) return;
-    var list = document.getElementById('partialSplitList');
-    if (list) list.innerHTML = '';
-    var sumSoFar = 0;
-    for (var i = 0; i < splits.length; i++) {
-        var s = splits[i];
-        var amt = parseFloat(s.amount) || 0;
-        var ratio = fullAmt > 0 ? amt / fullAmt : 0;
-        var partialAmt;
-        if (i === splits.length - 1) {
-            partialAmt = Math.round((received - sumSoFar) * 100) / 100;
-        } else {
-            partialAmt = Math.round(received * ratio * 100) / 100;
-            sumSoFar += partialAmt;
-        }
-        addPartialDestRow(s.acct || '', s.sub || '', partialAmt);
-    }
-    validatePartialSplits();
-    updatePartialConfirmButton();
-}
-
-function updatePartialConfirmButton() {
-    var btn = document.getElementById('btnPartialConfirm');
-    if (!btn) return;
-    var amountEl = document.getElementById('partialReceiveAmount');
-    var received = parseFloat(amountEl && amountEl.value || 0) || 0;
-    var rowCount = document.querySelectorAll('.partial-split-row').length;
-    var sum = 0;
-    document.querySelectorAll('.partial-split-row').forEach(function(row) {
-        var amtInp = row.querySelector('.partial-trf-amt');
-        if (amtInp) sum += parseFloat(amtInp.value) || 0;
-    });
-    var valid = true;
-    if (partialReceiveRequiresDestinations) {
-        valid = received > 0 && rowCount > 0 && Math.abs(sum - received) <= 0.01;
-    } else {
-        valid = received > 0 && (rowCount === 0 || Math.abs(sum - received) <= 0.01);
-    }
-    btn.disabled = !valid;
-}
-
-function addPartialDestRow(acct, sub, amt) {
-    if (typeof acct === 'undefined') acct = '';
-    if (typeof sub === 'undefined') sub = '';
-    if (typeof amt === 'undefined') amt = '';
-    var list = document.getElementById('partialSplitList');
-    if (!list) return;
-    var d = document.createElement('div');
-    d.className = 'flex gap-1 partial-split-row items-center w-full';
-    var acctOpts = '<option value="" disabled selected>Acct</option>';
-    (appData.sources || []).forEach(function(s) {
-        var n = Array.isArray(s) ? s[0] : s;
-        acctOpts += '<option value="' + n + '"' + (n === acct ? ' selected' : '') + '>' + n + '</option>';
-    });
-    d.innerHTML = '<select class="partial-trf-acct w-1/4 py-1 px-1 text-[10px] border border-amber-200 dark:border-amber-800 rounded outline-none">' + acctOpts + '</select>' +
-        '<div class="flex-1 relative"><input list="expenseSubList" class="partial-trf-sub w-full py-1 px-1 text-[10px] border border-amber-200 dark:border-amber-800 rounded outline-none" placeholder="Sub-Cat" value="' + (sub || '') + '" oninput="handlePartialTransferSubInput(this)"><input type="hidden" class="partial-trf-parent"></div>' +
-        '<input type="number" class="partial-trf-amt w-16 py-1 px-1 text-[10px] font-mono border border-amber-200 dark:border-amber-800 rounded outline-none" placeholder="Amt" value="' + (amt || '') + '" oninput="validatePartialSplits()">' +
-        '<button type="button" onclick="this.parentElement.remove(); validatePartialSplits(); updatePartialConfirmButton();" class="text-red-400 hover:text-red-600 p-0.5"><i data-feather="x" class="w-3 h-3"></i></button>';
-    list.appendChild(d);
-    if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
-    validatePartialSplits();
-    updatePartialConfirmButton();
-}
-function handlePartialTransferSubInput(inp) {
-    var val = (inp && inp.value || '').trim();
-    var parentInp = inp && inp.parentElement ? inp.parentElement.querySelector('.partial-trf-parent') : null;
-    if (!parentInp) return;
-    var match = null;
-    if (appData.categories) {
-        for (var p in appData.categories) {
-            var subs = appData.categories[p];
-            if (subs && subs.indexOf(val) !== -1) { match = p; break; }
-        }
-    }
-    parentInp.value = match || '';
-}
-function validatePartialSplits() {
-    var amountEl = document.getElementById('partialReceiveAmount');
-    var totalEl = document.getElementById('partialSplitTotal');
-    if (!amountEl || !totalEl) return true;
-    var received = parseFloat(amountEl.value) || 0;
-    var sum = 0;
-    document.querySelectorAll('.partial-split-row').forEach(function(row) {
-        var amtInp = row.querySelector('.partial-trf-amt');
-        if (amtInp) sum += parseFloat(amtInp.value) || 0;
-    });
-    totalEl.textContent = 'Allocated: \u20B9' + (sum.toLocaleString('en-IN') || '0');
-    if (document.querySelectorAll('.partial-split-row').length > 0) {
-        var diff = Math.abs(sum - received);
-        if (diff > 0.01) {
-            totalEl.classList.add('text-red-600', 'font-bold');
-            totalEl.classList.remove('text-gray-500');
-            return false;
-        }
-    }
-    totalEl.classList.remove('text-red-600', 'font-bold');
-    totalEl.classList.add('text-gray-500');
-    updatePartialConfirmButton();
-    return true;
-}
-function openPartialReceiveModal(id) {
-    currentPendingItem = pendingItemsMap[id];
-    if (!currentPendingItem) return showToast("Item not found", 'error');
-    partialReceiveRequiresDestinations = false;
-    var maxAmt = Number(currentPendingItem.amount) || 0;
-    document.getElementById('partialReceiveMaxHint').textContent = 'Max: \u20B9' + (maxAmt.toLocaleString('en-IN'));
-    document.getElementById('partialReceiveAmount').value = '';
-    document.getElementById('partialReceiveAmount').max = maxAmt;
-    document.getElementById('partialReceiveDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('partialReceiveError').classList.add('hidden');
-    var list = document.getElementById('partialSplitList');
-    if (list) list.innerHTML = '';
-    var trf = currentPendingItem.transferAccount;
-    var plannedSection = document.getElementById('partialPlannedSection');
-    var plannedListEl = document.getElementById('partialPlannedDestList');
-    var destLabel = document.getElementById('partialDestLabel');
-    var hintEl = document.getElementById('partialDestHint');
-    var autoSplitBtn = document.getElementById('btnPartialAutoSplit');
-    if (trf && trf.indexOf('[') === 0) {
-        try {
-            var arr = JSON.parse(trf);
-            if (arr.length > 0) {
-                partialReceiveRequiresDestinations = true;
-                if (plannedSection) plannedSection.classList.remove('hidden');
-                if (plannedListEl) {
-                    plannedListEl.textContent = arr.map(function(s) {
-                        return (s.acct || '') + ': \u20B9' + (parseFloat(s.amount) || 0).toLocaleString('en-IN');
-                    }).join('  |  ');
-                }
-                if (destLabel) destLabel.textContent = 'Where to send this partial payment? (required)';
-                if (hintEl) {
-                    hintEl.textContent = 'Allocate the partial amount to the same destinations, or use Auto-Split Proportional.';
-                    hintEl.classList.remove('hidden');
-                }
-                if (autoSplitBtn) autoSplitBtn.classList.remove('hidden');
-            } else {
-                if (plannedSection) plannedSection.classList.add('hidden');
-                if (destLabel) destLabel.textContent = 'Where to send this partial payment? (optional)';
-                if (hintEl) hintEl.classList.add('hidden');
-                if (autoSplitBtn) autoSplitBtn.classList.add('hidden');
-            }
-        } catch (e) {
-            if (plannedSection) plannedSection.classList.add('hidden');
-            if (destLabel) destLabel.textContent = 'Where to send this partial payment? (optional)';
-            if (hintEl) hintEl.classList.add('hidden');
-            if (autoSplitBtn) autoSplitBtn.classList.add('hidden');
-        }
-    } else {
-        if (plannedSection) plannedSection.classList.add('hidden');
-        if (destLabel) destLabel.textContent = 'Where to send this partial payment? (optional)';
-        if (hintEl) hintEl.classList.add('hidden');
-        if (autoSplitBtn) autoSplitBtn.classList.add('hidden');
-    }
-    validatePartialSplits();
-    updatePartialConfirmButton();
-    document.getElementById('partialReceiveModal').classList.remove('hidden');
-}
-function closePartialReceiveModal() {
-    document.getElementById('partialReceiveModal').classList.add('hidden');
-    currentPendingItem = null;
-}
-function confirmPartialReceive() {
-    if (!currentPendingItem) return;
-    var errEl = document.getElementById('partialReceiveError');
-    var received = parseFloat(document.getElementById('partialReceiveAmount').value);
-    var dateStr = document.getElementById('partialReceiveDate').value;
-    var fullAmt = parseFloat(currentPendingItem.amount) || 0;
-    errEl.classList.add('hidden');
-    if (!dateStr) { errEl.textContent = 'Select date'; errEl.classList.remove('hidden'); return; }
-    if (isNaN(received) || received <= 0) { errEl.textContent = 'Enter valid amount'; errEl.classList.remove('hidden'); return; }
-    if (received >= fullAmt) {
-        document.getElementById('approveAmount').value = fullAmt;
-        document.getElementById('approveDate').value = dateStr;
-        closePartialReceiveModal();
-        document.getElementById('approveModal').classList.remove('hidden');
-        return;
-    }
-    var partialSplits = [];
-    document.querySelectorAll('.partial-split-row').forEach(function(row) {
-        var acct = row.querySelector('.partial-trf-acct');
-        var sub = row.querySelector('.partial-trf-sub');
-        var parent = row.querySelector('.partial-trf-parent');
-        var amt = row.querySelector('.partial-trf-amt');
-        if (acct && acct.value && amt && parseFloat(amt.value) > 0) {
-            partialSplits.push({ acct: acct.value, sub: (sub && sub.value) || '', parent: (parent && parent.value) || 'Expense', amount: parseFloat(amt.value) });
-        }
-    });
-    if (partialReceiveRequiresDestinations) {
-        if (partialSplits.length === 0) {
-            errEl.textContent = 'Allocate the partial amount to destinations (or use Auto-Split Proportional).';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        var sum = partialSplits.reduce(function(a, s) { return a + s.amount; }, 0);
-        if (Math.abs(sum - received) > 0.01) {
-            errEl.textContent = 'Allocated total must equal amount received.';
-            errEl.classList.remove('hidden');
-            return;
-        }
-    } else if (partialSplits.length > 0 && !validatePartialSplits()) {
-        errEl.textContent = 'Allocated total must equal amount received.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    var newAmount = fullAmt - received;
-    var btn = document.getElementById('btnPartialConfirm');
-    btn.disabled = true;
-    btn.textContent = 'Processing...';
-    var transferAccount = (currentPendingItem.transferAccount && currentPendingItem.transferAccount !== '[]') ? currentPendingItem.transferAccount : '';
-    if (transferAccount && transferAccount.indexOf('[') === 0) {
-        try {
-            var splits = JSON.parse(transferAccount);
-            if (splits.length && fullAmt > 0) {
-                var ratio = newAmount / fullAmt;
-                var sumSoFar = 0;
-                var scaled = splits.map(function(s, i) {
-                    var amt = parseFloat(s.amount) || 0;
-                    var newVal;
-                    if (i === splits.length - 1) {
-                        newVal = Math.round((newAmount - sumSoFar) * 100) / 100;
-                    } else {
-                        newVal = Math.round(amt * ratio * 100) / 100;
-                        sumSoFar += newVal;
-                    }
-                    return { acct: s.acct, sub: s.sub || '', parent: s.parent || 'Expense', amount: newVal };
-                });
-                transferAccount = JSON.stringify(scaled);
-            }
-        } catch (e) {}
-    }
-    var payload = {
-        pendingId: currentPendingItem.id,
-        description: currentPendingItem.description,
-        amount: String(newAmount),
-        expectedDate: currentPendingItem.expectedDate,
-        incomeCategory: currentPendingItem.incomeCategory || 'Income',
-        incomeSubCategory: currentPendingItem.incomeSubCategory || '',
-        incomeAccount: currentPendingItem.incomeAccount || '',
-        transferAccount: transferAccount,
-        transferCategory: currentPendingItem.transferCategory || '',
-        transferSubCategory: currentPendingItem.transferSubCategory || ''
-    };
-    var incomePayload = { date: dateStr, type: 'Income', subCategory: currentPendingItem.incomeSubCategory || '', parentCategory: currentPendingItem.incomeCategory || 'Income', amount: received, mode: 'Cashless', source: currentPendingItem.incomeAccount || '', remarks: 'Partial: ' + currentPendingItem.description };
-    var desc = currentPendingItem.description;
-    var incAcct = currentPendingItem.incomeAccount || '';
-    function done() {
-        closePartialReceiveModal();
-        btn.disabled = false;
-        btn.textContent = 'Record Partial';
-        if (useSupabase()) {
-            refreshPendingFromServer();
-            fetchInitialDataFromSupabase().then(function(data) { onDataLoad(JSON.stringify(data)); });
-        } else {
-            if (typeof renderPendingTable === 'function') renderPendingTable(appData.pending || []);
-            if (typeof renderReportTable === 'function') renderReportTable(false);
-        }
-        showToast('Partial receive recorded. \u20B9' + received.toLocaleString('en-IN') + ' logged; balance \u20B9' + newAmount.toLocaleString('en-IN') + ' pending.');
-    }
-    function fail(e) {
-        errEl.textContent = e && e.message ? e.message : 'Failed';
-        errEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = 'Record Partial';
-    }
-    if (useSupabase()) {
-        var p = saveTransactionToSupabase(incomePayload);
-        partialSplits.forEach(function(split, i) {
-            p = p.then(function() {
-                var trfPayload = { transactionId: 'TXN-P-' + (Date.now() + i), date: dateStr, type: 'Transfer', subCategory: split.sub, parentCategory: split.parent || 'Transfer', amount: split.amount, mode: 'Cashless', source: incAcct, remarks: 'Partial: ' + desc + ' | To: ' + split.acct + ': ' + split.amount };
-                return saveTransactionToSupabase(trfPayload);
-            });
-        });
-        p.then(function() { return savePendingTransactionToSupabase(payload); }).then(done).catch(fail);
-    } else {
-        var idx = appData.pending.findIndex(function(p) { return p.id === currentPendingItem.id; });
-        if (idx >= 0) appData.pending[idx].amount = newAmount;
-        var s = appData.schema;
-        appData.expenses.push([('TXN-' + Date.now()), dateStr, 'Income', incomePayload.subCategory, incomePayload.parentCategory, received, 'Cashless', incomePayload.source, incomePayload.remarks]);
-        var base = Date.now();
-        partialSplits.forEach(function(split, i) {
-            appData.expenses.push([('TXN-P-' + (base + i)), dateStr, 'Transfer', split.sub, split.parent || 'Transfer', split.amount, 'Cashless', incAcct, 'Partial: ' + desc + ' | To: ' + split.acct + ': ' + split.amount]);
-        });
-        appData.expenses.sort(function(a,b) { return b[s.date].localeCompare(a[s.date]); });
-        if (typeof buildSearchIndex === 'function') buildSearchIndex();
-        if (typeof calculateLiveBalances === 'function') calculateLiveBalances();
-        done();
-    }
 }
 
 function submitApproval() {
@@ -3419,9 +2944,7 @@ function renderScheduledTable() {
             </td>
             <td class="p-3 font-mono font-bold">₹${amt.toLocaleString('en-IN')}</td>
             <td class="p-3 text-xs text-gray-500">${dEnd}</td>
-            <td class="p-3 flex flex-wrap gap-1 justify-center">
-                <button onclick="skipScheduleOccurrence('${id}')" class="text-amber-600 hover:text-amber-800 p-1 bg-amber-50 dark:bg-amber-900/30 rounded" title="Skip this occurrence"><i data-feather="skip-forward" class="w-4 h-4"></i></button>
-                <button onclick="openCreateOnceFromSchedule('${id}')" class="text-green-600 hover:text-green-800 p-1 bg-green-50 dark:bg-green-900/30 rounded" title="Create one-off for date"><i data-feather="calendar" class="w-4 h-4"></i></button>
+            <td class="p-3 flex gap-2 justify-center">
                 <button onclick="editSch('${id}')" class="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 dark:bg-blue-900/30 rounded"><i data-feather="edit-2" class="w-4 h-4"></i></button>
                 <button onclick="delSch('${id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded"><i data-feather="trash-2" class="w-4 h-4"></i></button>
             </td>
@@ -3441,70 +2964,6 @@ function delSch(id){
         if(useSupabase()) deleteScheduleToSupabase(id).catch(function(e){showToast(e&&e.message?e.message:'Failed','error');});
         else google.script.run.withSuccessHandler(function(){}).deleteSchedule(id);
     });
-}
-
-function addOnePeriod(dateStr, freq) {
-    var d = new Date(dateStr);
-    if (freq === 'Daily') d.setDate(d.getDate() + 1);
-    else if (freq === 'Weekly') d.setDate(d.getDate() + 7);
-    else if (freq === 'Monthly') d.setMonth(d.getMonth() + 1);
-    else return dateStr;
-    return d.toISOString().split('T')[0];
-}
-
-var currentCreateOnceSchedule = null;
-function openCreateOnceFromSchedule(id) {
-    var r = appData.scheduled.find(function(x) { return x[0] === id; });
-    if (!r) return showToast("Schedule not found", 'error');
-    currentCreateOnceSchedule = r;
-    document.getElementById('createOnceDate').value = r[2] || new Date().toISOString().split('T')[0];
-    document.getElementById('createOnceModal').classList.remove('hidden');
-}
-function closeCreateOnceModal() {
-    document.getElementById('createOnceModal').classList.add('hidden');
-    currentCreateOnceSchedule = null;
-}
-function confirmCreateOnce() {
-    if (!currentCreateOnceSchedule) return;
-    var dateStr = document.getElementById('createOnceDate').value;
-    if (!dateStr) return showToast("Select a date", 'error');
-    var r = currentCreateOnceSchedule;
-    var payload = { date: dateStr, type: r[4] || 'Expense', subCategory: r[5] || '', parentCategory: r[6] || '', amount: Number(r[7]) || 0, mode: r[8] || 'Cashless', source: r[9] || '', remarks: (r[10] || '') + ' (from schedule)' };
-    if (useSupabase()) {
-        saveTransactionToSupabase(payload).then(function() {
-            closeCreateOnceModal();
-            showToast("One-off transaction created.");
-            fetchInitialDataFromSupabase().then(function(data) { onDataLoad(JSON.stringify(data)); });
-        }).catch(function(e) { showToast(e && e.message ? e.message : 'Failed', 'error'); });
-    } else {
-        var s = appData.schema;
-        appData.expenses.push([('TXN-' + Date.now()), dateStr, r[4] || 'Expense', r[5] || '', r[6] || '', Number(r[7]) || 0, r[8] || 'Cashless', r[9] || '', (r[10] || '') + ' (from schedule)']);
-        appData.expenses.sort(function(a,b) { return b[s.date].localeCompare(a[s.date]); });
-        buildSearchIndex(); calculateLiveBalances();
-        closeCreateOnceModal();
-        renderScheduledTable();
-        if (typeof renderReportTable === 'function') renderReportTable(false);
-        showToast("One-off transaction created.");
-    }
-}
-
-function skipScheduleOccurrence(id) {
-    var r = appData.scheduled.find(function(x) { return x[0] === id; });
-    if (!r) return showToast("Schedule not found", 'error');
-    var currentStart = r[2];
-    var freq = r[1];
-    var newStart = addOnePeriod(currentStart, freq);
-    r[2] = newStart;
-    var p = { scheduleId: id, frequency: r[1], startDate: newStart, endDate: r[3] || null, type: r[4] || 'Expense', subCategory: r[5] || '', parentCategory: r[6] || '', amount: Number(r[7]) || 0, mode: r[8] || '', source: r[9] || '', remarks: r[10] || '' };
-    if (useSupabase()) {
-        saveScheduleToSupabase(p).then(function() {
-            renderScheduledTable();
-            showToast("Occurrence skipped. Next due: " + newStart);
-        }).catch(function(e) { showToast(e && e.message ? e.message : 'Failed', 'error'); r[2] = currentStart; renderScheduledTable(); });
-    } else {
-        renderScheduledTable();
-        showToast("Occurrence skipped. Next due: " + newStart);
-    }
 }
 function renderBudgetView(){
     const c=document.getElementById('budgetContainer'),s=document.getElementById('budgetCat');
@@ -4310,38 +3769,6 @@ function renderReportTable(reset = false) {
         catContainer.innerHTML += html;
     });
 
-    // 3b. BUDGET VS SPENT (when filter is this month)
-    const budgetVsEl = document.getElementById('reportBudgetVsSpent');
-    const budgetVsList = document.getElementById('reportBudgetVsSpentList');
-    if (budgetVsEl && budgetVsList) {
-        const mon = (fStart && fStart.slice(0, 7)) || new Date().toISOString().slice(0, 7);
-        const isThisMonth = fStart && fEnd && fStart.slice(0, 7) === mon && fEnd.slice(0, 7) === mon;
-        if (isThisMonth && appData.budgets) {
-            let listHtml = '';
-            Object.entries(appData.budgets).forEach(function(entry) {
-                const k = entry[0], l = entry[1];
-                if (!k.includes('#') || k.split('#')[1] !== mon) return;
-                const catKey = k.split('#')[0];
-                let spent = 0;
-                if (catKey.includes('|')) {
-                    const [p, sub] = catKey.split('|');
-                    if (hierMap[p] && hierMap[p].subs[sub]) spent = hierMap[p].subs[sub];
-                } else {
-                    if (hierMap[catKey]) spent = hierMap[catKey].total;
-                }
-                const limitP = toPaise(l);
-                const pct = limitP ? Math.round((spent / limitP) * 100) : 0;
-                const name = catKey.includes('|') ? catKey.replace(/\|/g, ' › ') : catKey;
-                const cl = pct >= 100 ? 'text-red-600 dark:text-red-400' : pct >= 80 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400';
-                listHtml += '<div class="flex justify-between ' + cl + '"><span class="truncate pr-1">' + name + '</span><span class="font-mono">₹' + fmtMoney(spent) + ' / ₹' + Number(l).toLocaleString('en-IN') + ' (' + pct + '%)</span></div>';
-            });
-            if (listHtml) {
-                budgetVsList.innerHTML = listHtml;
-                budgetVsEl.classList.remove('hidden');
-            } else budgetVsEl.classList.add('hidden');
-        } else budgetVsEl.classList.add('hidden');
-    }
-
     // 4. RENDER ROWS (Date Grouped + BULK CHECKBOXES)
     tbody.innerHTML = "";
     const viewData = currentFilteredData.slice(0, renderLimit);
@@ -4403,68 +3830,6 @@ function renderReportTable(reset = false) {
 function loadMoreRows() {
     renderLimit += BATCH_SIZE;
     renderReportTable(false);
-}
-
-var reportFilterChartInstance = null;
-function toggleReportChart() {
-    var panel = document.getElementById('reportChartPanel');
-    if (!panel) return;
-    if (panel.classList.contains('hidden')) {
-        panel.classList.remove('hidden');
-        renderReportFilterChart();
-    } else {
-        panel.classList.add('hidden');
-        if (reportFilterChartInstance) { reportFilterChartInstance.destroy(); reportFilterChartInstance = null; }
-    }
-    if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
-}
-function renderReportFilterChart() {
-    var canvas = document.getElementById('reportFilterChart');
-    if (!canvas) return;
-    var s = appData.schema;
-    var byCat = {};
-    currentFilteredData.forEach(function(r) {
-        if (r[s.type] === 'Expense') {
-            var key = (r[s.parent] || '') + ' / ' + (r[s.sub] || '');
-            byCat[key] = (byCat[key] || 0) + toPaise(r[s.amt]);
-        }
-    });
-    var entries = Object.entries(byCat).sort(function(a,b) { return b[1] - a[1]; }).slice(0, 12);
-    if (reportFilterChartInstance) reportFilterChartInstance.destroy();
-    reportFilterChartInstance = new Chart(canvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: entries.map(function(e) { return e[0].length > 20 ? e[0].slice(0, 18) + '...' : e[0]; }),
-            datasets: [{ label: 'Expense (₹)', data: entries.map(function(e) { return fromPaise(e[1]); }), backgroundColor: 'rgba(239, 68, 68, 0.6)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4 }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { beginAtZero: true, grid: { color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb' } },
-                y: { grid: { display: false } }
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-
-function printReport() {
-    var s = appData.schema;
-    var title = 'Report - ' + (document.getElementById('filterStartDate').value || 'Start') + ' to ' + (document.getElementById('filterEndDate').value || 'End');
-    var rupee = '\u20B9';
-    var rows = currentFilteredData.slice(0, 500).map(function(r) {
-        return '<tr><td>' + r[s.date] + '</td><td>' + (r[s.sub] || '') + '</td><td>' + (r[s.parent] || '') + '</td><td>' + (r[s.source] || '') + '</td><td>' + (r[s.remarks] || '') + '</td><td>' + r[s.type] + '</td><td>' + rupee + Number(r[s.amt]).toLocaleString('en-IN') + '</td></tr>';
-    }).join('');
-    var style = 'body{font-family:system-ui,sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f5f5f5}';
-    var head = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + title + '</title><style>' + style + '</style></head><body><h1>' + title + '</h1><p>Rows: ' + currentFilteredData.length + '</p><table><thead><tr><th>Date</th><th>Sub</th><th>Parent</th><th>Source</th><th>Remarks</th><th>Type</th><th>Amount</th></tr></thead><tbody>';
-    var html = head + rows + "\x3C/tbody\x3E\x3C/table\x3E\x3C/body\x3E\x3C/html\x3E";
-    var w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    w.focus();
-    setTimeout(function() { w.print(); w.close(); }, 250);
 }
 
 function resetFilters() {
@@ -4599,12 +3964,12 @@ function deletePreset(n) {
 // ==========================================
 // 5. INITIALIZATION (AT BOTTOM)
 // ==========================================
-document.addEventListener('DOMContentLoaded', function() {
-    try {
+document.addEventListener('DOMContentLoaded',()=>{
+    // Capture password-recovery flag from URL before Supabase client runs (client consumes the hash)
     var isRecoveryRedirect = !!(window.location && (window.location.hash || '').indexOf('type=recovery') !== -1);
 
     initTheme();
-    if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
+    safeFeatherReplace();
     setTimeout(()=>{
         if(!document.getElementById('splash').classList.contains('hidden')){
             document.getElementById('splash-status').innerText="Taking longer than usual...";
@@ -4614,9 +3979,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const now = new Date(); 
     const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-    ['inpDate','bulkDate','schStartDate','filterStartDate', 'filterEndDate', 'pendDate', 'approveDate', 'partialReceiveDate', 'createOnceDate'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) try { el.value = todayStr; } catch (err) {}
+    ['inpDate','bulkDate','schStartDate','filterStartDate', 'filterEndDate', 'pendDate', 'approveDate'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.value=todayStr;
     });
 
     const selParent=document.getElementById('selParentForSub');
@@ -4640,38 +4004,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Phase 3: If Supabase is configured, use sign-in + Supabase data; else use Google.
     const supabase = getSupabaseClient();
     if (supabase) {
-        var supabaseInitDone = false;
-        setTimeout(function() {
-            if (supabaseInitDone) return;
-            var splash = document.getElementById('splash');
-            var signinBox = document.getElementById('signinBox');
-            if (splash && !splash.classList.contains('hidden') && signinBox && signinBox.classList.contains('hidden')) {
-                supabaseInitDone = true;
-                document.getElementById('splash-status').textContent = 'Taking longer than usual...';
-                document.getElementById('forceLoadBtn').classList.remove('hidden');
-                showSignInUI();
-                supabase.auth.onAuthStateChange(function(event, payload) {
-                    if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                        supabaseUserId = payload.session.user.id;
-                        supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                        startAppWithSupabase();
-                    }
-                });
-            }
-        }, 4000);
         function tryStartWithSession() {
             supabase.auth.getSession().then(function(result) {
-                if (supabaseInitDone) return;
-                var session = result && result.data && result.data.session;
+                var session = result.data && result.data.session;
                 if (session && session.user && isRecoveryRedirect) {
-                    supabaseInitDone = true;
                     supabaseUserId = session.user.id;
                     supabaseUserEmail = session.user.email || supabaseUserEmail;
                     showSetNewPasswordUI();
                     return;
                 }
                 if (session && session.user) {
-                    supabaseInitDone = true;
                     supabaseUserId = session.user.id;
                     supabaseUserEmail = session.user.email || supabaseUserEmail;
                     startAppWithSupabase();
@@ -4681,16 +4023,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(function() {
                     if (supabaseUserId) return;
                     supabase.auth.getSession().then(function(r2) {
-                        var s2 = r2 && r2.data && r2.data.session;
+                        var s2 = r2.data && r2.data.session;
                         if (s2 && s2.user && isRecoveryRedirect) {
-                            supabaseInitDone = true;
                             supabaseUserId = s2.user.id;
                             supabaseUserEmail = s2.user.email || supabaseUserEmail;
                             showSetNewPasswordUI();
                             return;
                         }
                         if (s2 && s2.user) {
-                            supabaseInitDone = true;
                             supabaseUserId = s2.user.id;
                             supabaseUserEmail = s2.user.email || supabaseUserEmail;
                             startAppWithSupabase();
@@ -4704,28 +4044,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             });
                         }
-                    }).catch(function() {
-                        showSignInUI();
-                        supabase.auth.onAuthStateChange(function(event, payload) {
-                            if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                                supabaseUserId = payload.session.user.id;
-                                supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                                startAppWithSupabase();
-                            }
-                        });
                     });
                 }, 400);
-            }).catch(function() {
-                if (supabaseInitDone) return;
-                supabaseInitDone = true;
-                showSignInUI();
-                supabase.auth.onAuthStateChange(function(event, payload) {
-                    if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                        supabaseUserId = payload.session.user.id;
-                        supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                        startAppWithSupabase();
-                    }
-                });
             });
         }
         tryStartWithSession();
@@ -4745,13 +4065,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    document.addEventListener('keydown', handleShortcuts);
-    } catch (initErr) {
-        console.error('Init error', initErr);
-        document.getElementById('splash-status').textContent = 'Error: ' + (initErr && initErr.message ? initErr.message : 'Load failed');
-        document.getElementById('splash-spinner').classList.add('hidden');
-        document.getElementById('forceLoadBtn').classList.remove('hidden');
-    }
+    document.addEventListener('keydown',handleShortcuts);
 });
 
 // --- DASHBOARD LOGIC ---
@@ -4903,42 +4217,6 @@ function renderDashboard() {
             }
         }
     });
-
-    // 6. DASHBOARD BUDGET WIDGETS & ALERTS (this month)
-    const currentMonthStr = today.toISOString().slice(0, 7);
-    const sp = {};
-    appData.expenses.forEach(r => {
-        if (r[s.type] !== 'Expense' || !String(r[s.date]).startsWith(currentMonthStr)) return;
-        const p = r[s.parent] || '', sub = r[s.sub] || '';
-        sp[p] = (sp[p] || 0) + toPaise(r[s.amt]);
-        if (p && sub) sp[p + '|' + sub] = (sp[p + '|' + sub] || 0) + toPaise(r[s.amt]);
-    });
-    const alertsEl = document.getElementById('dashboardBudgetAlerts');
-    const widgetsEl = document.getElementById('dashboardBudgetWidgets');
-    if (alertsEl) alertsEl.innerHTML = '';
-    if (widgetsEl) widgetsEl.innerHTML = '';
-    const budgetAlerts = [];
-    Object.entries(appData.budgets || {}).forEach(function(entry) {
-        const k = entry[0], l = entry[1];
-        let catKey = k, limit = l;
-        if (!k.includes('#')) return;
-        const parts = k.split('#');
-        if (parts[1] !== currentMonthStr) return;
-        catKey = parts[0];
-        const lP = toPaise(limit);
-        if (!lP) return;
-        const u = sp[catKey] || 0;
-        const pct = Math.round((u / lP) * 100);
-        const displayName = catKey.includes('|') ? catKey.replace(/\|/g, ' › ') : catKey;
-        if (pct >= 100) budgetAlerts.push({ name: displayName, pct: pct, over: true });
-        else if (pct >= 80) budgetAlerts.push({ name: displayName, pct: pct, over: false });
-        const barClr = pct >= 100 ? 'bg-red-500' : pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500';
-        if (widgetsEl) widgetsEl.innerHTML += `<div class="glass-panel p-3 rounded-lg border border-gray-200 dark:border-gray-700"><div class="flex justify-between items-end mb-1"><span class="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">${displayName}</span><span class="text-xs font-mono font-bold">₹${fromPaise(u)} / ₹${Number(limit).toLocaleString('en-IN')}</span></div><div class="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden"><div class="${barClr} h-2 rounded-full transition-all" style="width:${Math.min(pct, 100)}%"></div></div><div class="text-[10px] text-gray-500 mt-0.5">${pct}% used</div></div>`;
-    });
-    if (alertsEl && budgetAlerts.length > 0) {
-        alertsEl.innerHTML = '<div class="glass-panel p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/20"><h4 class="text-xs font-bold uppercase text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-1"><i data-feather="alert-triangle" class="w-3 h-3"></i> Budget alerts</h4><ul class="text-xs space-y-1">' + budgetAlerts.map(a => '<li class="' + (a.over ? 'text-red-600 dark:text-red-400 font-bold' : 'text-amber-700 dark:text-amber-300') + '">' + a.name + ': ' + a.pct + '%' + (a.over ? ' (over limit)' : ' (near limit)') + '</li>').join('') + '</ul></div>';
-        if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
-    }
 }
 
 // --- SMART PREDICTION LOGIC (FREQUENCY BASED) ---
