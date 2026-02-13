@@ -566,7 +566,8 @@ function processRecurringTransactions() {
       if(end&&today>end)return; 
       if(today>=n){ 
         const tid="TXN-AUTO-"+today.getTime()+"-"+i; 
-        const ds=Utilities.formatDate(today,ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
+        // FIX: Use the Scheduled Date (n) instead of Today for the log, so it's accurate even if script runs late
+        const ds=Utilities.formatDate(n,ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
         es.appendRow([tid,ds,r[4],r[5],r[6],r[7],r[8],r[9],r[10]+" (Auto)"]); 
         if(r[1]==='One-Time'){ 
           data[i][3]=Utilities.formatDate(new Date(today.getTime()-86400000),ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
