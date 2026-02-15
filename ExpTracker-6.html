@@ -251,7 +251,7 @@
         </div>
     </div>
 
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-2 pointer-events-none"></div>
 
     <div class="w-full max-w-[98%] 2xl:max-w-[1800px] flex flex-col h-full gap-4">
         <div class="glass-panel p-3 flex justify-between items-center w-full flex-shrink-0">
@@ -659,7 +659,7 @@
                         </form>
                     </div>
 
-                    <div class="lg:col-span-8 glass-panel p-5 flex flex-col h-full relative">
+                    <div class="lg:col-span-8 glass-panel p-5 flex flex-col h-full relative min-h-0">
                         <div class="flex justify-between items-center mb-4 shrink-0">
                             <h3 class="text-base font-bold flex items-center gap-2">
                                 <span id="schViewTitle">Active Instructions</span>
@@ -685,7 +685,7 @@
                         <div id="schStatsBar" class="grid grid-cols-3 gap-3 mb-5 shrink-0"></div>
 
                         <div id="schListView"
-                            class="flex-1 overflow-y-auto custom-scroll rounded-lg border bg-white/50 dark:bg-gray-800/50">
+                            class="flex-1 min-h-0 overflow-y-auto custom-scroll rounded-lg border bg-white/50 dark:bg-gray-800/50">
                             <table class="w-full text-left text-xs">
                                 <thead
                                     class="bg-gray-100 dark:bg-gray-700 sticky top-0 z-10 text-gray-600 dark:text-gray-300 font-bold uppercase">
@@ -917,6 +917,16 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-base font-bold flex items-center gap-2"><i data-feather="pie-chart"
                                     class="text-purple-600 w-4 h-4"></i> Budgets</h3>
+                            <button onclick="openBudgetPlanner()"
+                                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow-sm flex items-center gap-1 transition">
+                                <i data-feather="map" class="w-3 h-3"></i> Plan Budget
+                            </button>
+                        </div>
+                        <div id="budgetVarianceWidget"
+                            class="hidden mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+                            <h4 class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase mb-2">Monthly
+                                Performance</h4>
+                            <div id="budgetVarianceContent" class="text-xs"></div>
                         </div>
                         <div id="budgetContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
                     </div>
@@ -4017,6 +4027,13 @@
 
             let visibleCount = 0;
 
+            // SORT: By Next Due Date (Ascending)
+            appData.scheduled.sort((a, b) => { // id: sort_scheduled
+                const dA = new Date(a[2]);
+                const dB = new Date(b[2]);
+                return dA - dB;
+            });
+
             // 2. ITERATE AND RENDER ROWS
             appData.scheduled.forEach(r => {
                 // r indices: [0]=ID, [1]=Freq, [2]=NextDue, [3]=Sunset, [5]=SubCat, [7]=Amount
@@ -4226,6 +4243,11 @@
                 c.innerHTML += `<div class="bg-white dark:bg-gray-800 p-4 rounded border border-gray-200 dark:border-gray-700 relative group transition-all ${anim}"><button type="button" onclick="delBud('${escK}')" class="absolute top-2 right-2 text-red-400 opacity-0 group-hover:opacity-100"><i data-feather="trash-2" class="w-4 h-4"></i></button><div class="flex justify-between items-end mb-2"><div><h4 class="font-bold">${displayName}</h4><p class="text-xs text-gray-500">Limit: ₹${limit}</p></div><div class="text-right"><span class="font-bold text-${clr}-600">₹${fromPaise(u)}</span></div></div><div class="w-full bg-gray-200 h-2 rounded"><div class="bg-${clr}-500 h-2 rounded" style="width:${pct}%"></div></div></div>`;
             });
             safeFeatherReplace();
+
+            // Ensure Budget Variance Report is rendered
+            if (typeof renderBudgetVariance === 'function') {
+                renderBudgetVariance().catch(err => console.error("Variance Render Error", err));
+            }
         }
         async function triggerManualSchedule() {
             var btn = event.target;
@@ -6144,6 +6166,406 @@
             updateScheduleStats(calCurrentDate);
         }
         // --- CALENDAR LOGIC END ---
+    </script>
+    <!-- BUDGET PLANNER MODAL -->
+    <div id="budgetPlannerModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+        <div
+            class="glass-panel p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in fade-in zoom-in duration-200">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                <i data-feather="map" class="text-blue-600"></i> Budget Planner
+            </h3>
+
+            <div class="mb-4 flex gap-4 items-center">
+                <label class="text-xs font-bold uppercase text-gray-500">Planning Month:</label>
+                <input type="month" id="bpMonth" class="compact-input w-40 font-bold"
+                    onchange="loadBudgetPlan(this.value)">
+            </div>
+
+            <!-- Step 1: High Level -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-800">
+                    <label class="compact-label text-green-700 dark:text-green-400">Est. Income</label>
+                    <input type="number" id="bpIncome"
+                        class="text-lg font-bold bg-transparent w-full outline-none text-green-800 dark:text-green-300 border-b border-transparent hover:border-gray-300 focus:border-blue-500 transition"
+                        oninput="updateBudgetCalc()" placeholder="0">
+                </div>
+                <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded border border-red-100 dark:border-red-800">
+                    <label class="compact-label text-red-700 dark:text-red-400">Fixed Commitments</label>
+                    <div class="flex justify-between items-center">
+                        <span id="bpFixed" class="text-lg font-bold text-red-800 dark:text-red-300">0</span>
+                        <button onclick="showFixedDetails()" class="text-xs underline text-red-600 hover:text-red-800"
+                            title="Based on Scheduled Expenses">View</button>
+                    </div>
+                </div>
+                <div
+                    class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-800 ring-2 ring-blue-100 dark:ring-blue-800">
+                    <label class="compact-label text-blue-700 dark:text-blue-400">Disposable Income</label>
+                    <span id="bpDisposable" class="text-lg font-bold text-blue-800 dark:text-blue-300">0</span>
+                </div>
+            </div>
+
+            <!-- Step 2: Allocations -->
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex gap-2 items-center">
+                    <h4 class="font-bold text-sm uppercase text-gray-500">Allocations</h4>
+                    <span
+                        class="text-[10px] bg-gray-100 dark:bg-gray-700 px-1.5 rounded text-gray-500">Zero-Based</span>
+                </div>
+                <div class="text-xs">
+                    Unallocated: <span id="bpRemaining" class="font-bold text-green-600">0</span>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 mb-4 flex-1 overflow-y-auto min-h-[200px]">
+                <table class="w-full text-xs text-left">
+                    <thead>
+                        <tr class="text-gray-500 border-b dark:border-gray-700">
+                            <th class="pb-2 pl-2">Category / Bucket</th>
+                            <th class="pb-2 w-32">Amount (₹)</th>
+                            <th class="pb-2 w-8"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="bpAllocationList" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                </table>
+                <button onclick="addBpRow()"
+                    class="mt-3 w-full py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded text-gray-500 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    + Add Allocation Bucket
+                </button>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-auto pt-4 border-t dark:border-gray-700">
+                <button onclick="closeBudgetPlanner()"
+                    class="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition">Cancel</button>
+                <button onclick="saveBudgetPlan()"
+                    class="px-6 py-2 text-sm font-bold bg-blue-600 text-white rounded hover:bg-blue-700 shadow-lg transition transform active:scale-95">Save
+                    Plan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- BUDGET PLANNER LOGIC ---
+        let bpCurrentPlan = { allocations: [] };
+
+        function openBudgetPlanner() {
+            document.getElementById('budgetPlannerModal').classList.remove('hidden');
+
+            // Default to current month if not set
+            const now = new Date();
+            const monthStr = now.toISOString().slice(0, 7); // YYYY-MM
+            if (!document.getElementById('bpMonth').value) {
+                document.getElementById('bpMonth').value = monthStr;
+            }
+
+            loadBudgetPlan(document.getElementById('bpMonth').value);
+        }
+
+        function closeBudgetPlanner() {
+            document.getElementById('budgetPlannerModal').classList.add('hidden');
+        }
+
+        async function loadBudgetPlan(monthStr) {
+            // 1. Calculate Fixed Expenses for this month from Schedule
+            const fixed = calculateMonthlyFixed(monthStr);
+            document.getElementById('bpFixed').innerText = fixed.toLocaleString('en-IN');
+
+            // 2. Try Fetch from Supabase
+            let plan = { income: 0, allocations: [] };
+
+            if (useSupabase()) {
+                try {
+                    const sb = getSupabaseClient();
+                    if (!sb) return;
+                    const { data, error } = await sb
+                        .from('monthly_budget_plans')
+                        .select('plan_data')
+                        .eq('month', monthStr)
+                        .single();
+
+                    if (data && data.plan_data) {
+                        plan = data.plan_data;
+                    } else {
+                        // Default Income from Schedule
+                        plan.income = calculateMonthlyIncome(monthStr);
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            // 3. Render
+            document.getElementById('bpIncome').value = plan.income || '';
+            renderBpAllocations(plan.allocations);
+            updateBudgetCalc();
+        }
+
+        function calculateMonthlyFixed(monthStr) {
+            // Simplified: Sum of all active Monthly/Weekly schedules
+            // In a real app, we would check if the schedule is valid for this specific month
+            let total = 0;
+            appData.scheduled.forEach(r => {
+                const type = r[4];
+                // INCLUDE 'Transfer' (SIPs, Savings) and 'Expense' (Bills)
+                if (type === 'Expense' || type === 'Transfer') {
+                    // Schema: ID, Freq, Start, End, Type, Sub, Parent, Amt...
+                    const freq = r[1];
+                    const amt = Number(r[7]);
+
+                    if (freq === 'Monthly') total += amt;
+                    if (freq === 'Weekly') total += (amt * 4); // Approx
+                    if (freq === 'Daily') total += (amt * 30);
+                }
+            });
+            return total;
+        }
+
+        function calculateMonthlyIncome(monthStr) {
+            let total = 0;
+            appData.scheduled.forEach(r => {
+                // Index 4 is Type
+                if (r[4] === 'Income') {
+                    const freq = r[1];
+                    const amt = Number(r[7]);
+                    if (freq === 'Monthly') total += amt;
+                    if (freq === 'Weekly') total += (amt * 4);
+                }
+            });
+            return total;
+        }
+
+        function renderBpAllocations(allocations) {
+            const tbody = document.getElementById('bpAllocationList');
+            tbody.innerHTML = '';
+            (allocations || []).forEach(a => {
+                addBpRow(a.category, a.amount);
+            });
+            // Ensure at least one row
+            if (!allocations || allocations.length === 0) addBpRow();
+        }
+
+        function addBpRow(cat = '', amt = '') {
+            const tbody = document.getElementById('bpAllocationList');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="pb-2 pl-2"><input type="text" class="bp-cat compact-input text-xs" list="subCatList" value="${cat}" placeholder="Bucket (e.g. SIP, Groceries)" oninput="updateBudgetCalc()"></td>
+                <td class="pb-2"><input type="number" class="bp-amt compact-input text-xs font-mono font-bold" value="${amt}" placeholder="0" oninput="updateBudgetCalc()"></td>
+                <td class="pb-2 text-center"><button onclick="this.closest('tr').remove(); updateBudgetCalc()" class="text-red-400 hover:text-red-600"><i data-feather="trash-2" class="w-3 h-3"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+            if (typeof feather !== 'undefined') feather.replace();
+        }
+
+        function updateBudgetCalc() {
+            const income = Number(document.getElementById('bpIncome').value) || 0;
+            const fixedStr = document.getElementById('bpFixed').innerText.replace(/,/g, '');
+            const fixed = Number(fixedStr) || 0;
+
+            const disposable = income - fixed;
+            document.getElementById('bpDisposable').innerText = disposable.toLocaleString('en-IN');
+
+            // Allocations
+            let allocated = 0;
+            document.querySelectorAll('.bp-amt').forEach(inp => {
+                allocated += Number(inp.value) || 0;
+            });
+
+            const remaining = disposable - allocated;
+            const remEl = document.getElementById('bpRemaining');
+            remEl.innerText = remaining.toLocaleString('en-IN');
+
+            if (remaining < 0) {
+                remEl.classList.remove('text-green-600');
+                remEl.classList.add('text-red-600');
+            } else {
+                remEl.classList.add('text-green-600');
+                remEl.classList.remove('text-red-600');
+            }
+        }
+
+        async function saveBudgetPlan() {
+            try {
+                if (!useSupabase()) return showToast("Requires Supabase connection", 'error');
+
+                const month = document.getElementById('bpMonth').value;
+                if (!month) return showToast("Please select a month", 'error');
+
+                const income = Number(document.getElementById('bpIncome').value) || 0;
+                const fixed = Number(document.getElementById('bpFixed').innerText.replace(/,/g, ''));
+
+                const allocations = [];
+                document.querySelectorAll('#bpAllocationList tr').forEach(tr => {
+                    const cat = tr.querySelector('.bp-cat').value;
+                    const amt = Number(tr.querySelector('.bp-amt').value);
+                    if (cat && amt) allocations.push({ category: cat, amount: amt });
+                });
+
+                const planData = {
+                    income,
+                    fixed_expenses: fixed,
+                    allocations,
+                    free_cash: Number(document.getElementById('bpRemaining').innerText.replace(/,/g, ''))
+                };
+
+                // Debug Log
+                console.log("Saving Budget Plan:", { month, planData });
+
+                const sb = getSupabaseClient();
+                if (!sb) throw new Error("Supabase client not initialized");
+
+                const { error } = await sb
+                    .from('monthly_budget_plans')
+                    .upsert({ month: month, plan_data: planData });
+
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    showToast("Save Failed: " + error.message, 'error');
+                } else {
+                    showToast("Budget Plan Saved Successfully!", 'success');
+                    closeBudgetPlanner();
+                    renderBudgetVariance(month); // Refresh view
+                }
+            } catch (err) {
+                console.error("Unexpected Error in saveBudgetPlan:", err);
+                showToast("Unexpected Error: " + err.message, 'error');
+            }
+        }
+
+        function showFixedDetails() {
+            // Just a toast for now, can be a tool-tip later
+            showToast("Calculated from your 'Scheduled' tab expenses.", 'info');
+        }
+
+        // --- VARIANCE REPORT LOGIC ---
+        async function renderBudgetVariance(monthStr = new Date().toISOString().slice(0, 7)) {
+            const container = document.getElementById('budgetVarianceWidget');
+            const content = document.getElementById('budgetVarianceContent');
+            const sb = getSupabaseClient();
+            if (!sb) return;
+
+            // 1. Fetch Plan
+            const { data: planData } = await sb
+                .from('monthly_budget_plans')
+                .select('plan_data')
+                .eq('month', monthStr)
+                .single();
+
+            if (!planData) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const plan = planData.plan_data;
+
+            // 2. Fetch Actuals from Supabase
+            // Calculate start and end of the month
+            const [y, m] = monthStr.split('-');
+            const startStr = `${monthStr}-01`;
+            const endStr = new Date(y, m, 0).toISOString().split('T')[0]; // Last day of month
+
+            const { data: actualRows, error } = await sb
+                .from('expenses') // Assuming table name is 'expenses'
+                .select('amount, type, parent, sub, remarks') // Changed cols
+                .gte('date', startStr)
+                .lte('date', endStr);
+            if (error) console.error("Error fetching actuals:", error);
+            const expenses = actualRows || [];
+
+            // 3. Render Header
+            const dateObj = new Date(monthStr + '-01');
+            const monthName = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            // Calculate Performance
+            let totalBucketSpent = 0;
+            // Pre-calculate to get total spent for header
+            // We need to iterate allocations to match expenses, OR iterate expenses to match allocations.
+            // Helper to get spent for a category
+            const getSpent = (catName) => {
+                return expenses.reduce((sum, row) => {
+                    if (row.type === 'Income') return sum;
+                    const c = (row.parent || '').toLowerCase();
+                    const s = (row.sub || '').toLowerCase();
+                    const r = (row.remarks || '').toLowerCase();
+                    if (c === catName || s === catName || r.includes(catName)) {
+                        return sum + Math.abs(Number(row.amount));
+                    }
+                    return sum;
+                }, 0);
+            };
+
+            plan.allocations.forEach(a => {
+                totalBucketSpent += getSpent(a.category.toLowerCase().trim());
+            });
+
+            const totalSpent = plan.fixed_expenses + totalBucketSpent;
+            const netResult = plan.income - totalSpent;
+            const isPositive = netResult >= 0;
+
+            // Calculate Net Disposable (Unallocated)
+            const totalAllocated = plan.allocations.reduce((sum, a) => sum + Number(a.amount), 0);
+            const netDisposable = (plan.income - plan.fixed_expenses) - totalAllocated;
+
+            content.innerHTML = `
+                <div class="flex justify-between items-end mb-3 border-b pb-2 dark:border-blue-800">
+                    <div>
+                        <div class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase">${monthName}</div>
+                    </div>
+                    <div class="text-right flex flex-col items-end gap-1">
+                         <div>
+                            <div class="text-[9px] text-gray-500 uppercase">Net Disposable</div>
+                            <div class="font-bold text-blue-600 text-xs">₹${netDisposable.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div class="mt-1 px-2 py-1 rounded ${isPositive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} text-[10px] font-bold uppercase tracking-wider">
+                            ${isPositive ? 'Budget Positive' : 'Budget Negative'}
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+            `;
+
+            // 4. Match & Render Allocations
+            plan.allocations.forEach(a => {
+                const target = a.amount;
+                const bucketName = a.category.toLowerCase().trim();
+
+                // Smart Match: Check Category, Sub, or Remarks
+                const spent = expenses.reduce((sum, row) => {
+                    // Skip Incomes
+                    if (row.type === 'Income') return sum;
+
+                    const cat = (row.parent || '').toLowerCase(); // Changed from category
+                    const sub = (row.sub || '').toLowerCase();    // Changed from sub_category
+                    const rem = (row.remarks || '').toLowerCase();
+
+                    // Exact match on Cat/Sub OR fuzzy match on Remarks
+                    if (cat === bucketName || sub === bucketName || rem.includes(bucketName)) {
+                        // Use Math.abs ensure we treat expense magnitude as positive logic
+                        // regardless of how it's stored (-ve or +ve)
+                        return sum + Math.abs(Number(row.amount));
+                    }
+                    return sum;
+                }, 0);
+
+                const isOver = spent > target;
+                const diff = Math.abs(spent - target);
+
+                content.innerHTML += `
+                    <div class="flex justify-between items-center text-xs p-2 bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700">
+                         <div class="flex-1">
+                            <div class="font-bold text-gray-700 dark:text-gray-300">${a.category}</div>
+                         </div>
+                         <div class="text-right">
+                             <div class="text-[10px] text-gray-400">Target: ₹${target.toLocaleString('en-IN')}</div>
+                             <div class="font-bold font-mono ${isOver ? 'text-red-600' : 'text-green-600'}">
+                                Spent: ₹${spent.toLocaleString('en-IN')}
+                             </div>
+                             ${isOver ? `<div class="text-[9px] text-red-500 font-bold">Exceeded by ₹${diff.toLocaleString('en-IN')}</div>` : ''}
+                         </div>
+                    </div>
+                `;
+            });
+            content.innerHTML += `</div >`;
+        }
+
     </script>
 </body>
 
