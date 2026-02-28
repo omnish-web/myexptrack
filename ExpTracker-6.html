@@ -270,10 +270,7 @@
                 <button id="signOutBtn" onclick="signOutSupabase()"
                     class="hidden text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded"
                     title="Sign out">Sign out</button>
-                <button type="button" onclick="openShortcutHelpModal()"
-                    class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                    title="Keyboard shortcuts"><i data-feather="help-circle"
-                        class="w-4 h-4 text-gray-500 dark:text-gray-400"></i></button>
+
                 <button onclick="toggleTheme()"
                     class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"><i data-feather="moon"
                         class="w-4 h-4 hidden dark:block"></i><i data-feather="sun"
@@ -664,7 +661,7 @@
                             <h3 class="text-base font-bold flex items-center gap-2">
                                 <span id="schViewTitle">Active Instructions</span>
                                 <div id="calNav"
-                                    class="hidden flex items-center gap-2 ml-4 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                    class="flex items-center gap-2 ml-4 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                                     <button onclick="changeCalMonth(-1)" class="p-1 hover:text-blue-600"><i
                                             data-feather="chevron-left" class="w-4 h-4"></i></button>
                                     <span id="calMonthLabel" class="font-bold min-w-[100px] text-center">January
@@ -2861,9 +2858,9 @@
             }
 
             return `
-    <div class="${c.bg} p-3 rounded-lg border border-transparent dark:border-gray-600 flex flex-col justify-center items-center shadow-sm">
-        <span class="text-[10px] font-bold uppercase ${c.txt} mb-1">${title}</span>
-        <span class="text-lg font-mono font-bold ${c.val}">${displayVal}</span>
+    <div class="${c.bg} p-2 px-4 rounded-lg border border-transparent dark:border-gray-600 flex justify-between items-center shadow-sm">
+        <span class="text-[10px] font-bold uppercase ${c.txt}">${title}</span>
+        <span class="text-base font-mono font-bold ${c.val}">${displayVal}</span>
     </div>`;
         }
 
@@ -3948,6 +3945,7 @@
             let pendingMonthlyAmt = 0;
             let countTotal = 0;
             let countProcessed = 0;
+            let sourceCommitments = {}; // Add object for account-wise breakdown
 
             // 4. Iterate Active Schedules
             appData.scheduled.forEach(r => {
@@ -3956,6 +3954,7 @@
                 const amt = Number(r[7]) || 0;
                 const nextDueStr = r[2];
                 const sunsetStr = r[3];
+                const sourceAcc = r[9] || 'Unspecified';
 
                 // Skip if expired before this month starts
                 if (sunsetStr) {
@@ -3966,10 +3965,15 @@
                 if (['Monthly', 'Weekly', 'Daily'].includes(freq)) {
                     countTotal++;
 
+                    let amtToAdd = 0;
+
                     // Normalize Burden
-                    if (freq === 'Monthly') totalMonthlyAmt += amt;
-                    else if (freq === 'Weekly') totalMonthlyAmt += (amt * 4);
-                    else if (freq === 'Daily') totalMonthlyAmt += (amt * 30);
+                    if (freq === 'Monthly') amtToAdd = amt;
+                    else if (freq === 'Weekly') amtToAdd = (amt * 4);
+                    else if (freq === 'Daily') amtToAdd = (amt * 30);
+
+                    totalMonthlyAmt += amtToAdd;
+                    sourceCommitments[sourceAcc] = (sourceCommitments[sourceAcc] || 0) + amtToAdd;
 
                     let isDone = false;
 
@@ -3997,12 +4001,51 @@
                 }
             });
 
+            // Prepare account-wise HTML (Horizontal Layout + Clickable)
+            let sourceBreakdownHtml = '<div class="flex gap-3 mt-1 text-[10px] overflow-x-auto custom-scroll">';
+            Object.entries(sourceCommitments).forEach(([src, srcAmt]) => {
+                sourceBreakdownHtml += `
+                    <button onclick="applySchFilter('${src}')" class="flex gap-1 items-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-2 py-0.5 rounded transition whitespace-nowrap group" title="Filter by ${src}">
+                        <span class="truncate text-gray-500 dark:text-gray-400 group-hover:text-blue-500 max-w-[80px]">${src}</span>
+                        <span class="font-mono font-bold text-gray-700 dark:text-gray-300">₹${srcAmt.toLocaleString('en-IN')}</span>
+                    </button>`;
+            });
+            sourceBreakdownHtml += '</div>';
+
             // 5. Render Stats
-            // Note: I updated the Title to include the Month Name (e.g., "Status (Feb)")
             stats.innerHTML =
                 renderStatCard(`Status (${monthName})`, `${countProcessed} / ${countTotal} Done`, "blue") +
-                renderStatCard("Remaining Due", pendingMonthlyAmt, "red") +
-                renderStatCard("Total Commitment", totalMonthlyAmt, "gray");
+                renderStatCard("Remaining Due", `₹${pendingMonthlyAmt.toLocaleString('en-IN')}`, "red") +
+                `<div class="bg-gray-50 dark:bg-gray-900/20 p-2 px-4 rounded-lg border border-transparent dark:border-gray-800 flex flex-col justify-center min-w-[200px]">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-[10px] font-bold text-gray-800 dark:text-gray-300 uppercase">Total Commitment</span>
+                        <span class="text-base font-mono font-bold text-gray-900 dark:text-gray-100">₹${totalMonthlyAmt.toLocaleString('en-IN')}</span>
+                    </div>
+                    ${Object.keys(sourceCommitments).length > 0 ? sourceBreakdownHtml : ''}
+                </div>`;
+        }
+
+        // --- NEW FILTER FUNCTION ---
+        let currentSchFilter = null;
+        function applySchFilter(source) {
+            // Find all rows that match this source and highlight them
+            const rows = document.querySelectorAll(`#scheduledTableBody tr[data-source="${source}"]`);
+            if (rows.length === 0) {
+                showToast("No schedules found for this account in the current view.", "info");
+                return;
+            }
+
+            rows.forEach(row => {
+                row.classList.add('bg-blue-100', 'dark:bg-blue-900/50', 'transition-colors', 'duration-500');
+
+                // Remove highlight after 2 seconds
+                setTimeout(() => {
+                    row.classList.remove('bg-blue-100', 'dark:bg-blue-900/50');
+                }, 2000);
+            });
+
+            // Scroll to the first highlighted row
+            rows[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function renderScheduledTable() {
@@ -4010,13 +4053,17 @@
             tb.innerHTML = '';
 
             // 1. SETUP DATA FOR "DONE" BADGES (Current Month Only)
-            const today = new Date();
-            const currentMonthIdx = today.getMonth();
-            const currentYear = today.getFullYear();
+            const realToday = new Date();
+            const currentMonthIdx = calCurrentDate.getMonth();
+            const currentYear = calCurrentDate.getFullYear();
 
             // Define window for checking logs (Start to End of THIS month)
             const startOfMonth = new Date(currentYear, currentMonthIdx, 1);
             const endOfMonth = new Date(currentYear, currentMonthIdx + 1, 0);
+
+            // Update Label
+            const label = document.getElementById('calMonthLabel');
+            if (label) label.innerText = new Date(currentYear, currentMonthIdx, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
             const s = appData.schema;
             // Get actual transaction logs for this month to verify payments
@@ -4044,11 +4091,12 @@
                 const subCat = r[5];
                 const parentCat = r[6]; // Assuming parent is at 6 based on your previous code
                 const amt = Number(r[7]) || 0;
+                const sourceAcc = r[9] || 'Unspecified';
 
                 // Skip Inactive/Expired
                 if (sunsetStr) {
                     const sunDate = new Date(sunsetStr);
-                    if (sunDate < today) return;
+                    if (sunDate < startOfMonth) return;
                 }
 
                 // --- SMART MATCH LOGIC (For Badge) ---
@@ -4080,7 +4128,7 @@
 
                 // Date Styling (Orange if due soon and NOT done)
                 const dNext = new Date(r[2]);
-                const isSoon = dNext <= new Date(today.getTime() + 7 * 86400000);
+                const isSoon = dNext <= new Date(realToday.getTime() + 7 * 86400000);
                 const dateColor = (isSoon && !isDone) ? "text-orange-600 font-bold" : "text-blue-600 font-medium";
 
                 // Frequency Badge with "DONE" Status
@@ -4103,7 +4151,7 @@
                 */
 
                 tb.innerHTML += `
-        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition ${rowBg}${staggerClass}">
+        <tr data-source="${sourceAcc}" class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition ${rowBg}${staggerClass}">
             <td class="p-3 whitespace-nowrap">${freqHtml}</td>
             <td class="p-3 ${dateColor}">${nextDueStr}</td>
             <td class="p-3 text-xs">
@@ -4123,8 +4171,8 @@
 
             safeFeatherReplace();
 
-            // 3. UPDATE STATS BAR (Default to Current Month for List View)
-            updateScheduleStats(new Date());
+            // 3. UPDATE STATS BAR (Use calCurrentDate for Month Navigation)
+            updateScheduleStats(calCurrentDate);
         }
 
         function delSch(id) {
@@ -5258,14 +5306,14 @@
             </td>
             <td class="p-3 pl-4 whitespace-nowrap">
                 <div class="font-bold text-gray-700 dark:text-gray-300 text-xs">${r[s.date]}</div>
-                <div class="text-[9px] text-gray-400 uppercase">${new Date(r[s.date]).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">${new Date(r[s.date]).toLocaleDateString('en-US', { weekday: 'short' })}</div>
             </td>
             <td class="p-3">
                 <div class="font-semibold text-gray-800 dark:text-gray-200 text-xs">${r[s.sub]}</div>
                 <div class="text-[10px] text-blue-500 cursor-pointer hover:underline" onclick="applyQuickFilter('${r[s.parent]}')">${r[s.parent]}</div>
             </td>
-            <td class="p-3 text-xs text-gray-500 break-words max-w-[150px]">${r[s.source]}</td>
-            <td class="p-3 text-xs text-gray-500 italic max-w-[200px] truncate" title="${r[s.remarks]}">${r[s.remarks]}</td>
+            <td class="p-3 text-xs text-gray-800 dark:text-gray-200 break-words max-w-[150px]">${r[s.source]}</td>
+            <td class="p-3 text-xs text-gray-800 dark:text-gray-200 italic max-w-[200px] truncate" title="${r[s.remarks]}">${r[s.remarks]}</td>
             <td class="p-3 text-right font-mono font-bold ${clr} text-xs">${sign} ₹${Number(r[s.amt]).toLocaleString('en-IN')}</td>
             <td class="p-3 text-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <div class="flex justify-center gap-1">
@@ -5883,7 +5931,6 @@
             // Toggle UI Containers
             document.getElementById('schListView').classList.toggle('hidden', !isList);
             document.getElementById('schCalendarView').classList.toggle('hidden', isList);
-            document.getElementById('calNav').classList.toggle('hidden', isList); // Show Month Nav only in Calendar
 
             // Toggle Button Styles
             const btnList = document.getElementById('btnViewList');
@@ -5905,7 +5952,11 @@
 
         function changeCalMonth(dir) {
             calCurrentDate.setMonth(calCurrentDate.getMonth() + dir);
-            renderCalendar();
+            if (currentViewMode === 'list') {
+                renderScheduledTable();
+            } else {
+                renderCalendar();
+            }
         }
 
         function initiateQuickSchedule(y, m, d, e) {
