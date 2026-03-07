@@ -5942,29 +5942,38 @@
                 const supabase = getSupabaseClient();
                 if (supabase) {
                     var supabaseInitDone = false;
+
+                    // 1. Immediately register the listener to catch fast OAuth redirects
+                    supabase.auth.onAuthStateChange(function (event, payload) {
+                        if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
+                            if (!supabaseInitDone) {
+                                supabaseInitDone = true;
+                                supabaseUserId = payload.session.user.id;
+                                supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
+                                startAppWithSupabase();
+                            }
+                        }
+                    });
+
+                    // 2. A fallback timeout just in case it takes too long
                     setTimeout(function () {
                         if (supabaseInitDone) return;
                         var splash = document.getElementById('splash');
                         var signinBox = document.getElementById('signinBox');
-                        // Use pointer-events-none check since we removed 'hidden' class from signinBox
                         if (splash && !splash.classList.contains('hidden') && signinBox && signinBox.classList.contains('pointer-events-none')) {
                             supabaseInitDone = true;
                             document.getElementById('splash-status').textContent = 'Establishing secure link...';
                             document.getElementById('forceLoadBtn').classList.remove('hidden');
                             showSignInUI();
-                            supabase.auth.onAuthStateChange(function (event, payload) {
-                                if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                                    supabaseUserId = payload.session.user.id;
-                                    supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                                    startAppWithSupabase();
-                                }
-                            });
                         }
                     }, 4000);
+
+                    // 3. Proactively check session
                     function tryStartWithSession() {
                         supabase.auth.getSession().then(function (result) {
                             if (supabaseInitDone) return;
                             var session = result && result.data && result.data.session;
+
                             if (session && session.user && isRecoveryRedirect) {
                                 supabaseInitDone = true;
                                 supabaseUserId = session.user.id;
@@ -5972,6 +5981,7 @@
                                 showSetNewPasswordUI();
                                 return;
                             }
+
                             if (session && session.user) {
                                 supabaseInitDone = true;
                                 supabaseUserId = session.user.id;
@@ -5979,11 +5989,14 @@
                                 startAppWithSupabase();
                                 return;
                             }
-                            // No session yet (maybe hash not processed). Wait a bit then try again or show sign-in.
+
+                            // Delay briefly before showing login UI to allow OAuth hash to process
                             setTimeout(function () {
-                                if (supabaseUserId) return;
+                                if (supabaseInitDone) return;
                                 supabase.auth.getSession().then(function (r2) {
+                                    if (supabaseInitDone) return;
                                     var s2 = r2 && r2.data && r2.data.session;
+
                                     if (s2 && s2.user && isRecoveryRedirect) {
                                         supabaseInitDone = true;
                                         supabaseUserId = s2.user.id;
@@ -5991,6 +6004,7 @@
                                         showSetNewPasswordUI();
                                         return;
                                     }
+
                                     if (s2 && s2.user) {
                                         supabaseInitDone = true;
                                         supabaseUserId = s2.user.id;
@@ -5998,36 +6012,15 @@
                                         startAppWithSupabase();
                                     } else {
                                         showSignInUI();
-                                        supabase.auth.onAuthStateChange(function (event, payload) {
-                                            if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                                                supabaseUserId = payload.session.user.id;
-                                                supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                                                startAppWithSupabase();
-                                            }
-                                        });
                                     }
                                 }).catch(function () {
+                                    if (supabaseInitDone) return;
                                     showSignInUI();
-                                    supabase.auth.onAuthStateChange(function (event, payload) {
-                                        if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                                            supabaseUserId = payload.session.user.id;
-                                            supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                                            startAppWithSupabase();
-                                        }
-                                    });
                                 });
                             }, 400);
                         }).catch(function () {
                             if (supabaseInitDone) return;
-                            supabaseInitDone = true;
                             showSignInUI();
-                            supabase.auth.onAuthStateChange(function (event, payload) {
-                                if (event === 'SIGNED_IN' && payload && payload.session && payload.session.user) {
-                                    supabaseUserId = payload.session.user.id;
-                                    supabaseUserEmail = payload.session.user.email || supabaseUserEmail;
-                                    startAppWithSupabase();
-                                }
-                            });
                         });
                     }
                     tryStartWithSession();
