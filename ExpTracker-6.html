@@ -168,6 +168,72 @@
             animation: toastFadeOut 0.2s ease-in forwards;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-slide-in-left {
+            animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pulseSlow {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-pulse-slow {
+            animation: pulseSlow 8s ease-in-out infinite;
+        }
+
         @keyframes toastFadeOut {
             to {
                 opacity: 0;
@@ -178,76 +244,256 @@
 </head>
 
 <body class="flex flex-col items-center p-4 h-screen w-screen overflow-hidden text-gray-800 dark:text-gray-100">
+    <!-- Splash Screen / Login Screen -->
+    <!-- Splash Screen / Login Screen (V2 Ultra Premium) -->
     <div id="splash"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-opacity duration-500">
+        class="fixed inset-0 z-[100] flex bg-gray-950 transition-opacity duration-1000 overflow-hidden text-gray-100">
+
+        <!-- Background Animations Data-Feather SVG Defs for Grid -->
+        <svg class="absolute w-0 h-0">
+            <defs>
+                <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                </pattern>
+            </defs>
+        </svg>
+
+        <!-- LEFT SIDE: Visual Environment -->
         <div
-            class="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full mx-4 border border-gray-200 dark:border-gray-700">
-            <div id="splash-spinner"
-                class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
-            <h2 id="splash-title" class="text-lg font-bold text-gray-800 dark:text-white">Connecting...</h2>
-            <p id="splash-status" class="text-xs text-gray-500 mt-2">Initializing App...</p>
-            <div id="errorBox" class="hidden mt-4 p-3 bg-red-50 dark:bg-red-900/30 rounded text-left">
-                <p class="text-[10px] font-bold text-red-600 uppercase">Error Details:</p>
-                <p id="errorMsg" class="text-xs text-red-600 font-mono break-words"></p>
+            class="hidden lg:flex flex-col justify-between w-[55%] relative overflow-hidden bg-gray-950 animate-slide-in-left">
+            <!-- Animated Gradient Orbs -->
+            <div
+                class="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-blue-600/20 blur-[120px] animate-pulse-slow mix-blend-screen pointer-events-none">
             </div>
-            <button id="forceLoadBtn" onclick="forceLoadApp()"
-                class="hidden mt-6 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded text-sm transition">Force
-                Open Dashboard</button>
-            <button id="testSupabaseBtn" onclick="testSupabaseConnection()"
-                class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-sm transition">Test
-                Supabase connection</button>
-            <!-- Phase 3: Sign-in - magic link or email+password -->
-            <div id="signinBox" class="hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 text-left">
-                <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-2">Sign in</h3>
-                <input type="email" id="signinEmail" placeholder="you@example.com"
-                    class="compact-input mb-2 text-sm w-full">
-                <input type="password" id="signinPassword" placeholder="Password (for sign in / sign up)"
-                    class="compact-input mb-2 text-sm w-full" autocomplete="current-password">
-                <div class="flex flex-col gap-2">
-                    <button type="button" id="signInPasswordBtn" onclick="signInWithPassword()"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded text-sm transition">Sign
-                        in with password</button>
-                    <button type="button" id="signUpPasswordBtn" onclick="signUpWithPassword()"
-                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded text-sm transition">Sign
-                        up (create account with password)</button>
-                    <button type="button" id="sendMagicLinkBtn" onclick="sendMagicLink()"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-sm transition">Send
-                        magic link</button>
-                    <a href="#" id="forgotPasswordLink"
-                        onclick="event.preventDefault(); showForgotPasswordBox(); return false;"
-                        class="text-xs text-blue-600 dark:text-blue-400 hover:underline text-center mt-1">Forgot
-                        password?</a>
-                </div>
-                <p id="signinMessage" class="mt-2 text-xs text-gray-500 dark:text-gray-400 hidden"></p>
-                <!-- Forgot password: request reset link -->
-                <div id="forgotPasswordBox" class="hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-2">Reset password</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Enter your email and we'll send a link to
-                        set a new password.</p>
-                    <input type="email" id="resetEmail" placeholder="you@example.com"
-                        class="compact-input mb-2 text-sm w-full">
-                    <div class="flex gap-2">
-                        <button type="button" id="sendResetLinkBtn" onclick="sendPasswordResetLink()"
-                            class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded text-sm transition">Send
-                            reset link</button>
-                        <button type="button" onclick="hideForgotPasswordBox()"
-                            class="px-3 py-2 bg-gray-200 dark:bg-gray-600 rounded text-sm">Cancel</button>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-600/20 blur-[140px] animate-pulse-slow mix-blend-screen pointer-events-none"
+                style="animation-delay: 2s;"></div>
+
+            <!-- Grid overlay -->
+            <rect width="100%" height="100%" fill="url(#gridPattern)"
+                class="absolute inset-0 w-full h-full pointer-events-none" />
+
+            <div class="relative z-10 p-16 h-full flex flex-col justify-center">
+                <div class="max-w-xl">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-[0_0_50px_rgba(79,70,229,0.4)] flex items-center justify-center mb-10 transform -rotate-6">
+                        <i data-feather="bar-chart-2" class="w-8 h-8 text-white"></i>
                     </div>
-                    <p id="resetLinkMessage" class="mt-2 text-xs text-gray-500 dark:text-gray-400 hidden"></p>
-                </div>
-                <!-- Set new password (after clicking reset link in email) -->
-                <div id="setNewPasswordBox" class="hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-2">Set new password</h3>
-                    <input type="password" id="newPassword" placeholder="New password"
-                        class="compact-input mb-2 text-sm w-full" autocomplete="new-password">
-                    <input type="password" id="newPasswordConfirm" placeholder="Confirm new password"
-                        class="compact-input mb-2 text-sm w-full" autocomplete="new-password">
-                    <button type="button" id="setNewPasswordBtn" onclick="submitNewPassword()"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-sm transition">Set
-                        new password</button>
-                    <p id="setNewPasswordMessage" class="mt-2 text-xs text-gray-500 dark:text-gray-400 hidden"></p>
+                    <h1 class="text-6xl sm:text-7xl font-black tracking-tighter text-white mb-6 leading-tight">
+                        Expense<span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Track</span>
+                    </h1>
+                    <p
+                        class="text-xl text-gray-400 font-light leading-relaxed max-w-md border-l-2 border-indigo-500/50 pl-6 py-2">
+                        Command your finances with absolute precision. Next-generation tracking, zero friction.
+                    </p>
                 </div>
             </div>
+
+            <div class="relative z-10 p-12 text-sm text-gray-600 font-medium tracking-widest uppercase">
+                <span class="opacity-50">&copy; 2026 ExpenseTrack </span><span
+                    class="text-indigo-500/50 mx-2">•</span><span class="opacity-50">Enterprise Grade</span>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: Authentication Panel -->
+        <div
+            class="w-full lg:w-[45%] flex flex-col items-center justify-center relative bg-black/40 backdrop-blur-3xl border-l border-white/5 animate-slide-in-right z-20 shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+
+            <!-- Mobile Header (Hidden on Desktop) -->
+            <div class="lg:hidden text-center mb-12 relative z-20 mt-12">
+                <div
+                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-[0_0_30px_rgba(79,70,229,0.3)] flex items-center justify-center mx-auto mb-6">
+                    <i data-feather="bar-chart-2" class="w-6 h-6 text-white"></i>
+                </div>
+                <h1 class="text-4xl font-black tracking-tighter text-white">
+                    Expense<span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Track</span>
+                </h1>
+            </div>
+
+            <!-- Login Container -->
+            <div class="w-full max-w-md px-8 sm:px-12 relative z-20">
+
+                <!-- Status & Preloading -->
+                <div class="mb-10 text-center lg:text-left transition-all duration-500">
+                    <h2 id="splash-title" class="text-2xl font-bold tracking-tight text-white mb-2">Welcome Back</h2>
+                    <div class="flex items-center justify-center lg:justify-start gap-3">
+                        <div id="splash-spinner"
+                            class="animate-spin rounded-full h-4 w-4 border-2 border-t-indigo-500 border-r-indigo-500 border-b-transparent border-l-transparent">
+                        </div>
+                        <p id="splash-status" class="text-sm text-indigo-400/80 font-medium tracking-wide">Connecting
+                            securely...</p>
+                    </div>
+                </div>
+
+                <!-- Error Box -->
+                <div id="errorBox"
+                    class="hidden mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-left backdrop-blur-md relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-500 to-rose-600"></div>
+                    <div class="flex items-center gap-2 mb-1.5 ml-2">
+                        <i data-feather="alert-triangle" class="w-4 h-4 text-red-400"></i>
+                        <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Connection Failed</p>
+                    </div>
+                    <p id="errorMsg" class="text-sm text-gray-300 font-mono break-words ml-2"></p>
+                </div>
+
+                <!-- Recovery Buttons -->
+                <button id="forceLoadBtn" onclick="forceLoadApp()"
+                    class="hidden w-full mb-4 group relative px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white text-sm font-semibold transition-all duration-300 overflow-hidden">
+                    <span class="relative z-10 flex items-center justify-center gap-2"><i data-feather="skip-forward"
+                            class="w-4 h-4"></i> Override & Enter Offline</span>
+                </button>
+                <button id="testSupabaseBtn" onclick="testSupabaseConnection()"
+                    class="hidden w-full mb-8 relative px-6 py-4 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 hover:text-indigo-200 rounded-2xl text-sm font-bold transition-all duration-300">
+                    <span class="flex items-center justify-center gap-2"><i data-feather="refresh-cw"
+                            class="w-4 h-4"></i> Retry Connection</span>
+                </button>
+
+                <!-- Phase 3: Sign-in Form -->
+                <div id="signinBox"
+                    class="opacity-0 pointer-events-none translate-y-4 transition-all duration-1000 text-left">
+                    <div class="space-y-6">
+                        <div class="relative group">
+                            <input type="email" id="signinEmail" placeholder=" "
+                                class="peer w-full bg-white/5 border border-white/10 text-white rounded-xl focus:ring-0 focus:border-indigo-500 block px-4 pb-3 pt-6 text-sm transition-all focus:bg-indigo-500/5 outline-none font-medium placeholder-transparent">
+                            <label
+                                class="absolute text-xs font-semibold text-gray-400 uppercase tracking-wider top-4 left-4 transition-all peer-focus:-translate-y-2 peer-focus:text-[10px] peer-focus:text-indigo-400 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-[10px]">Email
+                                Address</label>
+                            <i data-feather="mail"
+                                class="absolute right-4 top-4 w-4 h-4 text-gray-500 peer-focus:text-indigo-400 transition-colors"></i>
+                        </div>
+                        <div class="relative group">
+                            <input type="password" id="signinPassword" placeholder=" "
+                                class="peer w-full bg-white/5 border border-white/10 text-white rounded-xl focus:ring-0 focus:border-indigo-500 block px-4 pb-3 pt-6 text-sm transition-all focus:bg-indigo-500/5 outline-none font-medium placeholder-transparent"
+                                autocomplete="current-password">
+                            <label
+                                class="absolute text-xs font-semibold text-gray-400 uppercase tracking-wider top-4 left-4 transition-all peer-focus:-translate-y-2 peer-focus:text-[10px] peer-focus:text-indigo-400 peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:text-[10px]">Password</label>
+                            <i data-feather="lock"
+                                class="absolute right-4 top-4 w-4 h-4 text-gray-500 peer-focus:text-indigo-400 transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 mb-8">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-4 h-4 rounded border border-white/20 bg-white/5 flex items-center justify-center">
+                                <!-- Fake checkbox visual -->
+                                <i data-feather="check"
+                                    class="w-3 h-3 text-indigo-400 opacity-0 transition-opacity"></i>
+                            </div>
+                            <span class="text-xs text-gray-400">Remember me</span>
+                        </div>
+                        <a href="#" id="forgotPasswordLink"
+                            onclick="event.preventDefault(); showForgotPasswordBox(); return false;"
+                            class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">Forgot
+                            password?</a>
+                    </div>
+
+                    <div class="space-y-4">
+                        <button type="button" id="signInPasswordBtn" onclick="signInWithPassword()"
+                            class="relative w-full overflow-hidden rounded-xl p-[1px] group">
+                            <span
+                                class="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></span>
+                            <span
+                                class="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl"></span>
+                            <div
+                                class="relative bg-gray-900/40 backdrop-blur-sm rounded-xl px-6 py-4 flex items-center justify-center transition-all group-hover:bg-transparent">
+                                <span class="font-bold text-white text-sm tracking-wide">Authenticate</span>
+                                <i data-feather="arrow-right"
+                                    class="w-4 h-4 ml-2 text-white/70 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </button>
+
+                        <div class="relative flex py-4 items-center">
+                            <div class="flex-grow border-t border-white/10"></div>
+                            <span
+                                class="flex-shrink-0 mx-4 text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Alternative
+                                Logins</span>
+                            <div class="flex-grow border-t border-white/10"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <button type="button" id="signUpPasswordBtn" onclick="signUpWithPassword()"
+                                class="w-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs transition-all border border-white/10">
+                                <i data-feather="user-plus" class="w-3.5 h-3.5 opacity-70"></i> Register
+                            </button>
+                            <button type="button" id="sendMagicLinkBtn" onclick="sendMagicLink()"
+                                class="w-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs transition-all border border-white/10">
+                                <i data-feather="zap" class="w-3.5 h-3.5 opacity-70"></i> Magic Link
+                            </button>
+                        </div>
+
+                        <button type="button" id="signInGoogleBtn" onclick="signInWithGoogle()"
+                            class="w-full relative mt-4 bg-white/5 hover:bg-white/10 text-gray-200 hover:text-white font-bold flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm transition-all border border-white/10 overflow-hidden group">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                    fill="#4285F4" />
+                                <path
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                    fill="#34A853" />
+                                <path
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                    fill="#FBBC05" />
+                                <path
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                    fill="#EA4335" />
+                            </svg>
+                            Continue with Google
+                        </button>
+                    </div>
+
+                    <p id="signinMessage"
+                        class="mt-6 text-center text-xs font-semibold text-rose-400 hidden backdrop-blur-sm bg-rose-500/10 py-2 rounded-lg border border-rose-500/20">
+                    </p>
+
+                    <!-- Forgot password -->
+                    <div id="forgotPasswordBox"
+                        class="hidden mt-8 pt-8 border-t border-white/10 animate-fade-in relative z-30">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+                                <i data-feather="key" class="w-4 h-4 text-indigo-400"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-white">Reset credentials</h3>
+                        </div>
+                        <input type="email" id="resetEmail" placeholder="Email Address"
+                            class="w-full mb-4 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-0 focus:border-indigo-500 block p-4 text-sm transition-all focus:bg-indigo-500/5 outline-none">
+                        <div class="flex gap-3">
+                            <button type="button" id="sendResetLinkBtn" onclick="sendPasswordResetLink()"
+                                class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 pt-3.5 rounded-xl text-xs transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_25px_rgba(79,70,229,0.5)]">
+                                Transmit Reset Link
+                            </button>
+                            <button type="button" onclick="hideForgotPasswordBox()"
+                                class="px-5 py-3 pt-3.5 bg-white/5 hover:bg-white/10 text-gray-300 font-semibold rounded-xl text-xs transition-colors border border-white/10">
+                                Cancel
+                            </button>
+                        </div>
+                        <p id="resetLinkMessage"
+                            class="mt-4 text-center text-xs font-medium text-emerald-400 hidden bg-emerald-500/10 py-2 rounded border border-emerald-500/20">
+                        </p>
+                    </div>
+
+                    <!-- Set new password -->
+                    <div id="setNewPasswordBox"
+                        class="hidden mt-8 pt-8 border-t border-white/10 animate-fade-in relative z-30">
+                        <h3 class="text-sm font-bold text-white mb-4">Establish New Protocol</h3>
+                        <input type="password" id="newPassword" placeholder="New Password"
+                            class="w-full mb-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-0 focus:border-indigo-500 block p-4 text-sm transition-all focus:bg-indigo-500/5 outline-none"
+                            autocomplete="new-password">
+                        <input type="password" id="newPasswordConfirm" placeholder="Verify Password"
+                            class="w-full mb-5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-0 focus:border-indigo-500 block p-4 text-sm transition-all focus:bg-indigo-500/5 outline-none"
+                            autocomplete="new-password">
+                        <button type="button" id="setNewPasswordBtn" onclick="submitNewPassword()"
+                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]">
+                            Finalize Configuration
+                        </button>
+                        <p id="setNewPasswordMessage"
+                            class="mt-4 text-center text-xs font-medium text-emerald-400 hidden"></p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -256,7 +502,8 @@
     <div class="w-full max-w-[98%] 2xl:max-w-[1800px] flex flex-col h-full gap-4">
         <div class="glass-panel p-3 flex justify-between items-center w-full flex-shrink-0">
             <div class="flex items-center gap-4 min-w-0">
-                <div>
+                <div class="cursor-pointer hover:opacity-80 transition" title="Go to Dashboard"
+                    onclick="switchTab('dashboard')">
                     <h1 class="text-xl font-bold tracking-tight hidden md:block whitespace-nowrap leading-tight">
                         Expense<span class="text-blue-600">Track</span></h1>
                     <span id="lastSyncedIndicator"
@@ -277,8 +524,6 @@
                         class="w-4 h-4 block dark:hidden"></i></button>
                 <div
                     class="bg-gray-200/50 dark:bg-gray-700/50 p-1 rounded-lg flex text-xs font-semibold backdrop-blur-sm flex-shrink-0 overflow-x-auto">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard"
-                        class="nav-item px-4 py-1.5 rounded-md">Dashboard</button>
 
                     <button onclick="switchTab('entry')" id="nav-entry"
                         class="nav-item active px-4 py-1.5 rounded-md">Entry</button>
@@ -1427,22 +1672,26 @@
 
         function showSignInUI() {
             document.getElementById('splash-spinner').classList.add('hidden');
-            document.getElementById('splash-title').textContent = 'Sign in';
-            document.getElementById('splash-status').textContent = 'Enter your email to get a magic link.';
+            document.getElementById('splash-title').textContent = 'Secure Authentication';
+            document.getElementById('splash-status').textContent = 'Enter credentials to access your dashboard.';
             document.getElementById('errorBox').classList.add('hidden');
             document.getElementById('forceLoadBtn').classList.add('hidden');
             document.getElementById('testSupabaseBtn').classList.add('hidden');
-            document.getElementById('signinBox').classList.remove('hidden');
+            const signinBox = document.getElementById('signinBox');
+            signinBox.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            signinBox.classList.add('opacity-100', 'translate-y-0');
             document.getElementById('signinMessage').classList.add('hidden');
         }
 
 
 
         function hideSignInUI() {
-            document.getElementById('signinBox').classList.add('hidden');
+            const signinBox = document.getElementById('signinBox');
+            signinBox.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            signinBox.classList.remove('opacity-100', 'translate-y-0');
             document.getElementById('splash-spinner').classList.remove('hidden');
-            document.getElementById('splash-title').textContent = 'Connecting...';
-            document.getElementById('splash-status').textContent = 'Initializing App...';
+            document.getElementById('splash-title').textContent = 'Welcome Back';
+            document.getElementById('splash-status').textContent = 'Connecting securely...';
             document.getElementById('testSupabaseBtn').classList.remove('hidden');
         }
 
@@ -1471,6 +1720,38 @@
                 if (msgEl) { msgEl.textContent = err && err.message ? err.message : 'Failed to send link.'; msgEl.classList.remove('hidden'); }
                 btn.disabled = false;
                 btn.textContent = 'Send magic link';
+            });
+        }
+
+        function signInWithGoogle() {
+            var supabase = getSupabaseClient();
+            var msgEl = document.getElementById('signinMessage');
+            if (!supabase) {
+                if (msgEl) { msgEl.textContent = 'Supabase client not initialized.'; msgEl.classList.remove('hidden'); }
+                return;
+            }
+            if (msgEl) msgEl.classList.add('hidden');
+
+            var btn = document.getElementById('signInGoogleBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-2 border-t-white border-r-white border-b-transparent border-l-transparent"></div> Redirecting...';
+            }
+
+            supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + window.location.pathname
+                }
+            }).catch(function (error) {
+                if (msgEl) {
+                    msgEl.textContent = error.message || 'Failed to initialize Google login.';
+                    msgEl.classList.remove('hidden');
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Continue with Google';
+                }
             });
         }
 
@@ -1671,7 +1952,7 @@
                         if (!out.categories[r.parent]) out.categories[r.parent] = [];
                         out.categories[r.parent].push(String(r.sub));
                     });
-                    return supabase.from('sources').select('source_name, type, opening, stmt, due, link, fav, def').eq('user_id', uid);
+                    return supabase.from('sources').select('source_name, type, opening, stmt, due, link, fav, def').eq('user_id', uid).order('order_index', { ascending: true, nullsFirst: false });
                 })
                 .then(function (srcRes) {
                     if (srcRes.data) out.sources = srcRes.data.map(function (r) { return [r.source_name, r.type || 'Bank', Number(r.opening) || 0, r.stmt || '', r.due || '', r.link || '', !!r.fav, !!r.def]; });
@@ -1821,6 +2102,25 @@
             }
             return supabase.from('sources').update({ [col]: value }).eq('user_id', supabaseUserId).eq('source_name', sourceName).then(function (res) {
                 if (res.error) return Promise.reject(new Error(res.error.message));
+                return { success: true };
+            });
+        }
+
+        function updateSourcesOrderToSupabase(sourcesArray) {
+            var supabase = getSupabaseClient();
+            if (!supabase || !supabaseUserId) return Promise.reject(new Error('Not signed in'));
+
+            const promises = sourcesArray.map((s, index) => {
+                const name = Array.isArray(s) ? s[0] : s;
+                return supabase.from('sources')
+                    .update({ order_index: index })
+                    .eq('user_id', supabaseUserId)
+                    .eq('source_name', name);
+            });
+
+            return Promise.all(promises).then(results => {
+                const error = results.find(r => r.error);
+                if (error) return Promise.reject(new Error(error.error.message));
                 return { success: true };
             });
         }
@@ -2497,6 +2797,11 @@
                 resetBulkForm();
                 resetForm();
                 renderQuickFilterBar();
+
+                // Auto-run scheduled transactions silently on load
+                if (useSupabase()) {
+                    autoProcessSchedules();
+                }
 
                 document.getElementById('splash').classList.add('hidden');
                 if (supabaseUserId) {
@@ -3417,7 +3722,31 @@
         function updateSubFilter() { const p = document.getElementById('filterParent').value; const s = document.getElementById('filterSub'); if (!s) return; s.innerHTML = '<option value="">All Sub-Cats</option>'; let list = []; if (p && appData.categories[p]) { list = appData.categories[p]; } else { const set = new Set(); Object.values(appData.categories).flat().forEach(x => set.add(x)); list = Array.from(set).sort(); } list.forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`); }
         function populateRemarksDatalist() { const dl = document.getElementById('remarksList'); if (!dl) return; const u = new Set(); for (let i = appData.expenses.length - 1; i >= 0 && u.size < 20; i--) { if (appData.expenses[i][appData.schema.remarks]) u.add(appData.expenses[i][appData.schema.remarks]); } dl.innerHTML = ''; u.forEach(r => { const o = document.createElement('option'); o.value = r; dl.appendChild(o); }); }
         function refreshAllDatalists() { const t = document.getElementById('inpType').value, dl = document.getElementById('subCatList'); dl.innerHTML = ''; for (const [p, subs] of Object.entries(appData.categories)) { if ((t === 'Income' && p !== 'Income') || (t !== 'Income' && p === 'Income')) continue; subs.forEach(s => { const o = document.createElement('option'); o.value = s; dl.appendChild(o); }); } handleModeChange(); }
-        function renderSettingsUI() { const s = document.getElementById('settingsSourceList'), p = document.getElementById('settingsParentList'), sub = document.getElementById('settingsSubList'); if (!s || !p || !sub) return; const qf = getQuickFilters(); const esc = (str) => str.replace(/'/g, "\\'"); s.innerHTML = (appData.sources || []).map((r, i) => { const n = Array.isArray(r) ? r[0] : r, type = Array.isArray(r) ? (r[1] || 'Bank') : 'Bank'; const openVal = Array.isArray(r) ? (Number(r[2]) || 0) : 0; const f = Array.isArray(r) ? r[6] : false, def = Array.isArray(r) ? r[7] : false; return `<div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700 text-sm"><div class="flex flex-col gap-0.5"><span class="font-medium text-gray-700 dark:text-gray-300">${n}</span><span class="text-[10px] text-gray-400 uppercase tracking-wider">${type}</span><span class="text-[10px] text-gray-500">Opening: <input type="number" step="0.01" class="w-20 text-xs border border-gray-300 dark:border-gray-600 rounded px-1 bg-white dark:bg-gray-700" value="${openVal}" onchange="updateSourceOpeningByIndex(${i}, this.value)" title="Set opening/current balance"></span></div><div class="flex gap-2"><button onclick="toggleFlag('${esc(n)}','fav',${!f},this)" class="${f ? 'text-yellow-500' : 'text-gray-300'}"><i data-feather="star" class="w-4 h-4"></i></button><button onclick="toggleFlag('${esc(n)}','def',${!def},this)" class="${def ? 'text-green-600' : 'text-gray-300'}"><i data-feather="check-circle" class="w-4 h-4"></i></button><button onclick="delSet('source','${esc(n)}')" class="text-red-400"><i data-feather="trash-2" class="w-4 h-4"></i></button></div></div>`; }).join(''); p.innerHTML = Object.keys(appData.categories).map(x => { const isPinned = qf.includes(x); return `<div class="flex justify-between items-center bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-xs border border-blue-100 dark:border-blue-800"><span onclick="selectParentForSub('${esc(x)}')" class="font-bold text-blue-800 dark:text-blue-200 cursor-pointer hover:underline flex-1" title="Click to show sub-categories">${x}</span><div class="flex gap-2 flex-shrink-0"><button type="button" onclick="event.stopPropagation();toggleQuickFilter('${esc(x)}')" class="${isPinned ? 'text-indigo-600 fill-current' : 'text-gray-300 hover:text-indigo-400'}"><i data-feather="bookmark" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i></button><button type="button" onclick="event.stopPropagation();renameParentCat('${esc(x)}')" class="text-blue-500 hover:text-blue-700"><i data-feather="edit-2" class="w-3 h-3"></i></button><button type="button" onclick="event.stopPropagation();deleteParentCat('${esc(x)}')" class="text-red-400 hover:text-red-600"><i data-feather="trash-2" class="w-3 h-3"></i></button></div></div>`; }).join(''); const sel = document.getElementById('selParentForSub'), cur = sel.value; sel.innerHTML = '<option disabled selected>Select Parent First</option>'; Object.keys(appData.categories).sort().forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`); if (cur && appData.categories[cur]) sel.value = cur; const par = sel.value; if (par && !par.includes('Select')) { sub.innerHTML = (appData.categories[par] || []).map(item => { const isPinned = qf.includes(item); return `<div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700 text-sm"><span class="font-medium text-gray-700 dark:text-gray-300">${item}</span><div class="flex gap-2"><button onclick="toggleQuickFilter('${esc(item)}')" class="${isPinned ? 'text-indigo-600' : 'text-gray-300 hover:text-indigo-400'}"><i data-feather="bookmark" class="w-4 h-4 ${isPinned ? 'fill-current' : ''}"></i></button><button onclick="renameSubCat('${esc(par)}','${esc(item)}')" class="text-blue-500 hover:text-blue-700" title="Rename sub-category"><i data-feather="edit-2" class="w-4 h-4"></i></button><button onclick="reclass('${esc(item)}','${par}')" class="text-blue-500"><i data-feather="corner-up-right" class="w-4 h-4"></i></button><button onclick="delSet('sub','${esc(item)}','${par}')" class="text-red-400"><i data-feather="trash-2" class="w-4 h-4"></i></button></div></div>`; }).join(''); } safeFeatherReplace(); }
+        function renderSettingsUI() {
+            const s = document.getElementById('settingsSourceList'), p = document.getElementById('settingsParentList'), sub = document.getElementById('settingsSubList'); if (!s || !p || !sub) return; const qf = getQuickFilters(); const esc = (str) => str.replace(/'/g, "\\'"); s.innerHTML = (appData.sources || []).map((r, i, arr) => {
+                const n = Array.isArray(r) ? r[0] : r, type = Array.isArray(r) ? (r[1] || 'Bank') : 'Bank'; const openVal = Array.isArray(r) ? (Number(r[2]) || 0) : 0; const f = Array.isArray(r) ? r[6] : false, def = Array.isArray(r) ? r[7] : false;
+                const isFirst = i === 0;
+                const isLast = i === arr.length - 1;
+                return `<div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="flex flex-col gap-0.5 text-gray-400">
+                        <button onclick="moveSource(${i}, 'up')" class="hover:text-blue-500 ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}" ${isFirst ? 'disabled' : ''}><i data-feather="chevron-up" class="w-4 h-4"></i></button>
+                        <button onclick="moveSource(${i}, 'down')" class="hover:text-blue-500 ${isLast ? 'opacity-30 cursor-not-allowed' : ''}" ${isLast ? 'disabled' : ''}><i data-feather="chevron-down" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">${n}</span>
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">${type}</span>
+                        <span class="text-[10px] text-gray-500">Opening: <input type="number" step="0.01" class="w-20 text-xs border border-gray-300 dark:border-gray-600 rounded px-1 bg-white dark:bg-gray-700" value="${openVal}" onchange="updateSourceOpeningByIndex(${i}, this.value)" title="Set opening/current balance"></span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="toggleFlag('${esc(n)}','fav',${!f},this)" class="${f ? 'text-yellow-500' : 'text-gray-300'}"><i data-feather="star" class="w-4 h-4"></i></button>
+                    <button onclick="toggleFlag('${esc(n)}','def',${!def},this)" class="${def ? 'text-green-600' : 'text-gray-300'}"><i data-feather="check-circle" class="w-4 h-4"></i></button>
+                    <button onclick="delSet('source','${esc(n)}')" class="text-red-400"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            </div>`;
+            }).join(''); p.innerHTML = Object.keys(appData.categories).map(x => { const isPinned = qf.includes(x); return `<div class="flex justify-between items-center bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-xs border border-blue-100 dark:border-blue-800"><span onclick="selectParentForSub('${esc(x)}')" class="font-bold text-blue-800 dark:text-blue-200 cursor-pointer hover:underline flex-1" title="Click to show sub-categories">${x}</span><div class="flex gap-2 flex-shrink-0"><button type="button" onclick="event.stopPropagation();toggleQuickFilter('${esc(x)}')" class="${isPinned ? 'text-indigo-600 fill-current' : 'text-gray-300 hover:text-indigo-400'}"><i data-feather="bookmark" class="w-3 h-3 ${isPinned ? 'fill-current' : ''}"></i></button><button type="button" onclick="event.stopPropagation();renameParentCat('${esc(x)}')" class="text-blue-500 hover:text-blue-700"><i data-feather="edit-2" class="w-3 h-3"></i></button><button type="button" onclick="event.stopPropagation();deleteParentCat('${esc(x)}')" class="text-red-400 hover:text-red-600"><i data-feather="trash-2" class="w-3 h-3"></i></button></div></div>`; }).join(''); const sel = document.getElementById('selParentForSub'), cur = sel.value; sel.innerHTML = '<option disabled selected>Select Parent First</option>'; Object.keys(appData.categories).sort().forEach(k => sel.innerHTML += `<option value="${k}">${k}</option>`); if (cur && appData.categories[cur]) sel.value = cur; const par = sel.value; if (par && !par.includes('Select')) { sub.innerHTML = (appData.categories[par] || []).map(item => { const isPinned = qf.includes(item); return `<div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700 text-sm"><span class="font-medium text-gray-700 dark:text-gray-300">${item}</span><div class="flex gap-2"><button onclick="toggleQuickFilter('${esc(item)}')" class="${isPinned ? 'text-indigo-600' : 'text-gray-300 hover:text-indigo-400'}"><i data-feather="bookmark" class="w-4 h-4 ${isPinned ? 'fill-current' : ''}"></i></button><button onclick="renameSubCat('${esc(par)}','${esc(item)}')" class="text-blue-500 hover:text-blue-700" title="Rename sub-category"><i data-feather="edit-2" class="w-4 h-4"></i></button><button onclick="reclass('${esc(item)}','${par}')" class="text-blue-500"><i data-feather="corner-up-right" class="w-4 h-4"></i></button><button onclick="delSet('sub','${esc(item)}','${par}')" class="text-red-400"><i data-feather="trash-2" class="w-4 h-4"></i></button></div></div>`; }).join(''); } safeFeatherReplace();
+        }
         function selectParentForSub(parentName) {
             var sel = document.getElementById('selParentForSub');
             if (sel && appData.categories[parentName]) { sel.value = parentName; renderSettingsUI(); }
@@ -3581,6 +3910,46 @@
                 updateSourceFlagsToSupabase(n, t, v).then(done).catch(fail);
             } else {
                 google.script.run.withSuccessHandler(done).withFailureHandler(fail).updateSourceFlags(n, t, v);
+            }
+        }
+
+        // --- SOURCE REORDERING ---
+        function moveSource(index, direction) {
+            const sources = appData.sources;
+            if (!sources || sources.length === 0) return;
+
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+            // Boundary checks
+            if (newIndex < 0 || newIndex >= sources.length) return;
+
+            // Swap in memory
+            const temp = sources[index];
+            sources[index] = sources[newIndex];
+            sources[newIndex] = temp;
+
+            // Re-render UI to show new order immediately
+            renderSettingsUI();
+            calculateLiveBalances(); // Update ticker order
+            populateFilterDropdowns(); // Update dropdowns
+
+            // Sync with backend
+            syncSourcesOrder();
+        }
+
+        function syncSourcesOrder() {
+            if (useSupabase()) {
+                updateSourcesOrderToSupabase(appData.sources).then(() => {
+                    // Silently succeeded
+                }).catch(err => {
+                    showToast("Failed to save new order: " + (err.message || 'Error'), 'error');
+                });
+            } else {
+                // For Google Apps Script, pass an array of names in the new order
+                const orderedNames = appData.sources.map(s => Array.isArray(s) ? s[0] : s);
+                google.script.run.withFailureHandler(err => {
+                    showToast("Failed to save new order: " + (err.message || 'Error'), 'error');
+                }).reorderSources(orderedNames);
             }
         }
         function updateSourceOpeningByIndex(i, val) {
@@ -4297,6 +4666,85 @@
                 renderBudgetVariance().catch(err => console.error("Variance Render Error", err));
             }
         }
+        // --- AUTO PROCESS SCHEDULER ---
+        async function autoProcessSchedules() {
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                let processedCount = 0;
+                let schedules = appData.scheduled || [];
+
+                for (let i = 0; i < schedules.length; i++) {
+                    let r = schedules[i];
+                    let nextDueStr = r[2];
+                    let n = new Date(nextDueStr);
+                    n.setHours(0, 0, 0, 0);
+
+                    let end = r[3] ? new Date(r[3]) : null;
+                    if (end) end.setHours(0, 0, 0, 0);
+
+                    if (end && today > end) continue; // Expired
+
+                    if (today >= n) {
+                        // Time to run!
+                        let txnDate = nextDueStr; // n formatted as YYYY-MM-DD
+                        let payload = {
+                            date: txnDate,
+                            type: r[4] || 'Expense',
+                            subCategory: r[5] || '',
+                            parentCategory: r[6] || '',
+                            amount: Number(r[7]) || 0,
+                            mode: r[8] || 'Cashless',
+                            source: r[9] || '',
+                            remarks: (r[10] || '') + ' (Auto)'
+                        };
+
+                        // Save Transaction
+                        await saveTransactionToSupabase(payload);
+
+                        // Update Schedule Next Due Date
+                        if (r[1] === 'One-Time') {
+                            let yesterday = new Date(today);
+                            yesterday.setDate(yesterday.getDate() - 1);
+                            r[3] = yesterday.toISOString().split('T')[0];
+                        } else {
+                            let newDate = addOnePeriod(nextDueStr, r[1]);
+                            r[2] = newDate;
+                        }
+
+                        // Save Schedule Update
+                        let schedulePayload = {
+                            scheduleId: r[0],
+                            frequency: r[1],
+                            startDate: r[2],
+                            endDate: r[3],
+                            type: r[4],
+                            subCategory: r[5],
+                            parentCategory: r[6],
+                            amount: r[7],
+                            mode: r[8],
+                            source: r[9],
+                            remarks: r[10]
+                        };
+
+                        await saveScheduleToSupabase(schedulePayload);
+                        processedCount++;
+                    }
+                }
+
+                if (processedCount > 0) {
+                    // Silent refresh
+                    console.log(`Auto-processed ${processedCount} schedules.`);
+                    const data = await fetchInitialDataFromSupabase();
+                    onDataLoad(JSON.stringify(data));
+                }
+
+            } catch (e) {
+                console.error("Auto-processing schedules error:", e);
+            }
+        }
+
         async function triggerManualSchedule() {
             var btn = event.target;
             var originalText = btn.innerText;
@@ -4305,87 +4753,8 @@
 
             if (useSupabase()) {
                 try {
-                    // Client-side implementation of processRecurringTransactions for Supabase
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    let processedCount = 0;
-                    let schedules = appData.scheduled || [];
-
-                    for (let i = 0; i < schedules.length; i++) {
-                        let r = schedules[i];
-                        // r indices: [0]=ID, [1]=Freq, [2]=NextDue, [3]=Sunset, [4]=Type ...
-                        let nextDueStr = r[2];
-                        let n = new Date(nextDueStr);
-                        n.setHours(0, 0, 0, 0);
-
-                        let end = r[3] ? new Date(r[3]) : null;
-                        if (end) end.setHours(0, 0, 0, 0);
-
-                        if (end && today > end) continue; // Expired
-
-                        if (today >= n) {
-                            // TIME TO RUN!
-                            // 1. Create Transaction Payload
-                            // FIX: Use 'n' (Scheduled Date) as transaction date, NOT today
-                            let txnDate = nextDueStr; // n formatted as YYYY-MM-DD
-
-                            let payload = {
-                                date: txnDate,
-                                type: r[4] || 'Expense',
-                                subCategory: r[5] || '',
-                                parentCategory: r[6] || '',
-                                amount: Number(r[7]) || 0,
-                                mode: r[8] || 'Cashless',
-                                source: r[9] || '',
-                                remarks: (r[10] || '') + ' (Auto)'
-                            };
-
-                            // 2. Save Transaction
-                            await saveTransactionToSupabase(payload);
-
-                            // 3. Update Schedule Next Due Date
-                            if (r[1] === 'One-Time') {
-                                // For One-Time, we set it to yesterday so it doesn't run again, effectively "done"
-                                let yesterday = new Date(today);
-                                yesterday.setDate(yesterday.getDate() - 1);
-                                r[3] = yesterday.toISOString().split('T')[0]; // Set Sunset to yesterday
-                                // Or just delete it? Backend sets NextDue to yesterday-1. Let's follow backend pattern if possible, 
-                                // but `addOnePeriod` doesn't handle logic. 
-                                // Backend: data[i][3] = Utilities.formatDate(..., -1 day) (Sets Sunset)
-                                let y = new Date(); y.setDate(y.getDate() - 1);
-                                r[3] = y.toISOString().split('T')[0];
-                            } else {
-                                // Calculate new Next Due
-                                let newDate = addOnePeriod(nextDueStr, r[1]);
-                                r[2] = newDate;
-                            }
-
-                            // 4. Save Schedule Update
-                            let schedulePayload = {
-                                scheduleId: r[0],
-                                frequency: r[1],
-                                startDate: r[2], // New start date (Next Due)
-                                endDate: r[3],
-                                type: r[4],
-                                subCategory: r[5],
-                                parentCategory: r[6],
-                                amount: r[7],
-                                mode: r[8],
-                                source: r[9],
-                                remarks: r[10]
-                            };
-
-                            await saveScheduleToSupabase(schedulePayload);
-                            processedCount++;
-                        }
-                    }
-
-                    showToast(`Checked schedules. Processed: ${processedCount}`);
-                    // Reload data to show new transactions
-                    const data = await fetchInitialDataFromSupabase();
-                    onDataLoad(JSON.stringify(data));
-
+                    await autoProcessSchedules();
+                    showToast(`Manual check complete!`);
                 } catch (e) {
                     console.error(e);
                     showToast("Error processing schedules: " + e.message, "error");
@@ -5537,8 +5906,9 @@
                 initTheme();
                 if (typeof safeFeatherReplace === 'function') safeFeatherReplace();
                 setTimeout(() => {
-                    if (!document.getElementById('splash').classList.contains('hidden')) {
-                        document.getElementById('splash-status').innerText = "Taking longer than usual...";
+                    // Check if splash is visible and signinBox is still invisible
+                    if (!document.getElementById('splash').classList.contains('hidden') && document.getElementById('signinBox').classList.contains('pointer-events-none')) {
+                        document.getElementById('splash-status').innerText = "Establishing secure link...";
                         document.getElementById('forceLoadBtn').classList.remove('hidden');
                     }
                 }, 5000);
@@ -5576,9 +5946,10 @@
                         if (supabaseInitDone) return;
                         var splash = document.getElementById('splash');
                         var signinBox = document.getElementById('signinBox');
-                        if (splash && !splash.classList.contains('hidden') && signinBox && signinBox.classList.contains('hidden')) {
+                        // Use pointer-events-none check since we removed 'hidden' class from signinBox
+                        if (splash && !splash.classList.contains('hidden') && signinBox && signinBox.classList.contains('pointer-events-none')) {
                             supabaseInitDone = true;
-                            document.getElementById('splash-status').textContent = 'Taking longer than usual...';
+                            document.getElementById('splash-status').textContent = 'Establishing secure link...';
                             document.getElementById('forceLoadBtn').classList.remove('hidden');
                             showSignInUI();
                             supabase.auth.onAuthStateChange(function (event, payload) {

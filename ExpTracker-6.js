@@ -6,7 +6,7 @@
 
 function doGet() {
   // Matches the filename 'Index.html'
-  return HtmlService.createTemplateFromFile('Index') 
+  return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('Expense Command Center')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
@@ -15,11 +15,11 @@ function doGet() {
 
 function getInitialData() {
   const response = {
-    expenses: [], 
-    categories: {}, 
-    sources: [], 
-    scheduled: [], 
-    budgets: {}, 
+    expenses: [],
+    categories: {},
+    sources: [],
+    scheduled: [],
+    budgets: {},
     pending: [],
     snapshot: null, // NEW: Field for snapshot data
     schema: { id: 0, date: 1, type: 2, sub: 3, parent: 4, amt: 5, mode: 6, source: 7, remarks: 8 }
@@ -28,23 +28,23 @@ function getInitialData() {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const tz = Session.getScriptTimeZone();
-    
+
     // --- SETUP SHEETS ---
     let expSheet = ss.getSheetByName('Expenses');
     if (!expSheet) { expSheet = ss.insertSheet('Expenses'); expSheet.appendRow(['Transaction ID', 'Date', 'Type', 'Sub', 'Parent', 'Amount', 'Mode', 'Source', 'Remarks']); }
-    
+
     let catSheet = ss.getSheetByName('Categories');
     if (!catSheet) { catSheet = ss.insertSheet('Categories'); catSheet.appendRow(['Utility', 'Grocery']); }
-    
+
     let srcSheet = ss.getSheetByName('Source');
     if (!srcSheet) { srcSheet = ss.insertSheet('Source'); srcSheet.appendRow(['Source', 'Type', 'Opening', 'Stmt', 'Due', 'Link', 'Fav', 'Def']); }
-    
+
     let recSheet = ss.getSheetByName('Recurring');
     if (!recSheet) { recSheet = ss.insertSheet('Recurring'); recSheet.appendRow(['ID', 'Freq', 'Date', 'End', 'Type', 'Sub', 'Parent', 'Amt', 'Mode', 'Src', 'Rem']); }
-    
+
     let budgetSheet = ss.getSheetByName('Budgets');
     if (!budgetSheet) { budgetSheet = ss.insertSheet('Budgets'); budgetSheet.appendRow(['Category', 'Limit']); }
-    
+
     let pendSheet = ss.getSheetByName('Pending_Transactions');
     if (!pendSheet) {
       pendSheet = ss.insertSheet('Pending_Transactions');
@@ -53,25 +53,25 @@ function getInitialData() {
 
     // NEW: SNAPSHOT SHEET SETUP
     let snapSheet = ss.getSheetByName('Balance_Snapshots');
-    if (!snapSheet) { 
-        snapSheet = ss.insertSheet('Balance_Snapshots'); 
-        snapSheet.appendRow(['Date', 'Balances_JSON', 'Notes']); 
+    if (!snapSheet) {
+      snapSheet = ss.insertSheet('Balance_Snapshots');
+      snapSheet.appendRow(['Date', 'Balances_JSON', 'Notes']);
     }
 
     // --- 1. GET LATEST SNAPSHOT & CUTOFF DATE ---
     const snapLR = snapSheet.getLastRow();
     let cutoffDate = new Date('2000-01-01'); // Default: Load everything if no snapshot
-    
+
     if (snapLR > 1) {
-        // Get the very last snapshot
-        const lastSnap = snapSheet.getRange(snapLR, 1, 1, 2).getValues()[0];
-        if (lastSnap[0]) {
-            response.snapshot = {
-                date: Utilities.formatDate(new Date(lastSnap[0]), tz, 'yyyy-MM-dd'),
-                balances: JSON.parse(lastSnap[1])
-            };
-            cutoffDate = new Date(lastSnap[0]);
-        }
+      // Get the very last snapshot
+      const lastSnap = snapSheet.getRange(snapLR, 1, 1, 2).getValues()[0];
+      if (lastSnap[0]) {
+        response.snapshot = {
+          date: Utilities.formatDate(new Date(lastSnap[0]), tz, 'yyyy-MM-dd'),
+          balances: JSON.parse(lastSnap[1])
+        };
+        cutoffDate = new Date(lastSnap[0]);
+      }
     }
 
     // --- 2. LOAD EXPENSES (PAGINATED) ---
@@ -79,14 +79,14 @@ function getInitialData() {
     if (expLR > 1) {
       // Fetch all data (filtering in memory is faster than multi-calls for typical sheet sizes < 50k rows)
       const rawData = expSheet.getRange(2, 1, expLR - 1, 9).getValues();
-      
+
       response.expenses = rawData.filter(r => {
-         if (r[0] === "") return false;
-         
-         // CRITICAL: Only include rows NEWER than the snapshot
-         // (Snapshot includes balances for everything before this date)
-         const rowDate = new Date(r[1]);
-         return rowDate > cutoffDate; 
+        if (r[0] === "") return false;
+
+        // CRITICAL: Only include rows NEWER than the snapshot
+        // (Snapshot includes balances for everything before this date)
+        const rowDate = new Date(r[1]);
+        return rowDate > cutoffDate;
       }).map(r => {
         if (r[1] && r[1] instanceof Date) r[1] = Utilities.formatDate(r[1], tz, 'yyyy-MM-dd');
         return r;
@@ -128,7 +128,7 @@ function getInitialData() {
     if (srcLR > 1) {
       response.sources = srcSheet.getRange(2, 1, srcLR - 1, 8).getValues().filter(r => r[0] !== "");
     }
-    
+
     // --- 6. LOAD BUDGETS ---
     const budgetLR = budgetSheet.getLastRow();
     if (budgetLR > 1) {
@@ -137,7 +137,7 @@ function getInitialData() {
         if (row[0] && row[1]) response.budgets[row[0]] = Number(row[1]);
       });
     }
-    
+
     // --- 7. LOAD PENDING TRANSACTIONS ---
     if (pendSheet) {
       const pData = pendSheet.getDataRange().getValues();
@@ -169,17 +169,17 @@ function fetchHistory(year) {
   const sheet = ss.getSheetByName('Expenses');
   const tz = Session.getScriptTimeZone();
   const data = sheet.getDataRange().getValues();
-  
+
   // Filter for specific year (or all older data)
   const results = data.slice(1).filter(r => {
-      if(!r[1]) return false;
-      const d = new Date(r[1]);
-      return d.getFullYear() === parseInt(year);
+    if (!r[1]) return false;
+    const d = new Date(r[1]);
+    return d.getFullYear() === parseInt(year);
   }).map(r => {
-      if (r[1] instanceof Date) r[1] = Utilities.formatDate(r[1], tz, 'yyyy-MM-dd');
-      return r;
+    if (r[1] instanceof Date) r[1] = Utilities.formatDate(r[1], tz, 'yyyy-MM-dd');
+    return r;
   });
-  
+
   return JSON.stringify(results);
 }
 
@@ -188,7 +188,7 @@ function saveSnapshot(dateStr, balancesJSON) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName('Balance_Snapshots');
   if (!sheet) sheet = ss.insertSheet('Balance_Snapshots');
-  
+
   sheet.appendRow([dateStr, balancesJSON, 'User Generated']);
   return "Snapshot Saved";
 }
@@ -197,17 +197,17 @@ function saveSnapshot(dateStr, balancesJSON) {
 function savePendingTransaction(formObject) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName("Pending_Transactions");
-  
+
   const isEdit = formObject.pendingId && formObject.pendingId !== "";
   const id = isEdit ? formObject.pendingId : "PEND-" + new Date().getTime();
   const timestamp = new Date();
-  
+
   let trfAcct = formObject.transferAccount || "";
   let trfCat = formObject.transferCategory || "";
   let trfSub = formObject.transferSubCategory || "";
-  
+
   if (formObject.transferSplits && formObject.transferSplits !== "[]") {
-    trfAcct = formObject.transferSplits; 
+    trfAcct = formObject.transferSplits;
     trfCat = "Split";
     trfSub = "Split";
   }
@@ -236,7 +236,7 @@ function getPendingTransactions() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName("Pending_Transactions");
   if (!sheet) return [];
-  
+
   const data = sheet.getDataRange().getValues();
   return data.slice(1).filter(r => r[11] === "Pending").map(r => ({
     id: r[0],
@@ -267,12 +267,12 @@ function deletePendingTransaction(id) {
 
 function approvePendingTransaction(finalData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const txnSheet = ss.getSheetByName("Expenses"); 
+  const txnSheet = ss.getSheetByName("Expenses");
   const pendSheet = ss.getSheetByName("Pending_Transactions");
-  
-  const txnDate = finalData.date ? new Date(finalData.date) : new Date(); 
+
+  const txnDate = finalData.date ? new Date(finalData.date) : new Date();
   const time = new Date().getTime();
-  
+
   // 1. APPEND TRANSACTIONS FIRST (Safe Data)
   try {
     // Log Income
@@ -281,7 +281,7 @@ function approvePendingTransaction(finalData) {
       txnDate, "Income", finalData.incomeSubCategory, "Income", finalData.amount,
       "Cashless", finalData.incomeAccount, finalData.description
     ]);
-    
+
     // Log Transfers
     if (finalData.transferAccount && finalData.transferAccount !== "") {
       if (finalData.transferAccount.startsWith("[")) {
@@ -300,7 +300,7 @@ function approvePendingTransaction(finalData) {
         txnSheet.appendRow([
           "TXN-" + time + "-TRF",
           txnDate, "Transfer", finalData.transferSubCategory, finalData.transferCategory,
-          finalData.amount, "Cashless", finalData.incomeAccount, 
+          finalData.amount, "Cashless", finalData.incomeAccount,
           remarkString
         ]);
       }
@@ -319,295 +319,341 @@ function approvePendingTransaction(finalData) {
       break;
     }
   }
-  
+
   return { status: "success", message: "Transaction Approved & Logged" };
 }
 
 // --- STANDARD HELPER FUNCTIONS ---
 
-function saveTransaction(f) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const es=ss.getSheetByName('Expenses'); 
-    const src=f.splits&&f.splits.length>0?f.splits.map(s=>`${s.source}: ${s.amount}`).join(' | '):f.source||""; 
-    const id=f.transactionId||"TXN-"+new Date().getTime(); 
-    const row=[id,String(f.date),f.type,f.subCategory,f.parentCategory,f.amount,f.mode,src,f.remarks]; 
-    if(f.transactionId){ 
-      const fin=es.createTextFinder(id).matchEntireCell(true); 
-      const r=fin.findNext(); 
-      if(r)es.getRange(r.getRow(),1,1,9).setValues([row]); 
-      else throw new Error("ID not found"); 
-    }else{ 
-      es.appendRow(row); 
-    } 
-    const lastRow=es.getLastRow(); 
-    if(lastRow>1)es.getRange(2,1,lastRow-1,9).sort({column:2,ascending:false}); 
-    return JSON.stringify({success:true,savedId:id}); 
-  } catch(e){ 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function saveTransaction(f) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const es = ss.getSheetByName('Expenses');
+    const src = f.splits && f.splits.length > 0 ? f.splits.map(s => `${s.source}: ${s.amount}`).join(' | ') : f.source || "";
+    const id = f.transactionId || "TXN-" + new Date().getTime();
+    const row = [id, String(f.date), f.type, f.subCategory, f.parentCategory, f.amount, f.mode, src, f.remarks];
+    if (f.transactionId) {
+      const fin = es.createTextFinder(id).matchEntireCell(true);
+      const r = fin.findNext();
+      if (r) es.getRange(r.getRow(), 1, 1, 9).setValues([row]);
+      else throw new Error("ID not found");
+    } else {
+      es.appendRow(row);
+    }
+    const lastRow = es.getLastRow();
+    if (lastRow > 1) es.getRange(2, 1, lastRow - 1, 9).sort({ column: 2, ascending: false });
+    return JSON.stringify({ success: true, savedId: id });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function deleteTransaction(id) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const es=ss.getSheetByName('Expenses'); 
-    const f=es.createTextFinder(id).matchEntireCell(true); 
-    const r=f.findNext(); 
-    if(r)es.deleteRow(r.getRow()); 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function deleteTransaction(id) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const es = ss.getSheetByName('Expenses');
+    const f = es.createTextFinder(id).matchEntireCell(true);
+    const r = f.findNext();
+    if (r) es.deleteRow(r.getRow());
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function restoreTransaction(txnData) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const es=ss.getSheetByName('Expenses'); 
-    es.appendRow(txnData); 
-    const lastRow=es.getLastRow(); 
-    if(lastRow>1)es.getRange(2,1,lastRow-1,9).sort({column:2,ascending:false}); 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function restoreTransaction(txnData) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const es = ss.getSheetByName('Expenses');
+    es.appendRow(txnData);
+    const lastRow = es.getLastRow();
+    if (lastRow > 1) es.getRange(2, 1, lastRow - 1, 9).sort({ column: 2, ascending: false });
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function saveBatchTransactions(p) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const es=ss.getSheetByName('Expenses'); 
-    const rows=[]; const ids=[]; const t=new Date().getTime(); 
-    p.entries.forEach((e,i)=>{ 
-      const id="TXN-"+(t+i); ids.push(id); 
-      rows.push([id,e.date,e.type,e.subCategory,e.parentCategory,e.amount,e.mode,e.source,e.remarks]); 
-    }); 
-    if(rows.length>0){ 
-      es.getRange(es.getLastRow()+1,1,rows.length,9).setValues(rows); 
-      const lastRow=es.getLastRow(); 
-      if(lastRow>1)es.getRange(2,1,lastRow-1,9).sort({column:2,ascending:false}); 
-    } 
-    return JSON.stringify({success:true,savedIds:ids}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function saveBatchTransactions(p) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const es = ss.getSheetByName('Expenses');
+    const rows = []; const ids = []; const t = new Date().getTime();
+    p.entries.forEach((e, i) => {
+      const id = "TXN-" + (t + i); ids.push(id);
+      rows.push([id, e.date, e.type, e.subCategory, e.parentCategory, e.amount, e.mode, e.source, e.remarks]);
+    });
+    if (rows.length > 0) {
+      es.getRange(es.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
+      const lastRow = es.getLastRow();
+      if (lastRow > 1) es.getRange(2, 1, lastRow - 1, 9).sort({ column: 2, ascending: false });
+    }
+    return JSON.stringify({ success: true, savedIds: ids });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function saveSchedule(f) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const rs=ss.getSheetByName('Recurring'); 
-    const id=f.scheduleId||"SCH-"+new Date().getTime(); 
-    const row=[id,f.frequency,f.startDate,f.endDate,f.type,f.subCategory,f.parentCategory,f.amount,f.mode,f.source,f.remarks]; 
-    if(f.scheduleId){ 
-      const fin=rs.createTextFinder(id).matchEntireCell(true); 
-      const r=fin.findNext(); 
-      if(r)rs.getRange(r.getRow(),1,1,11).setValues([row]); 
-      else throw new Error("ID not found"); 
-    }else{ 
-      rs.appendRow(row); 
-    } 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function saveSchedule(f) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const rs = ss.getSheetByName('Recurring');
+    const id = f.scheduleId || "SCH-" + new Date().getTime();
+    const row = [id, f.frequency, f.startDate, f.endDate, f.type, f.subCategory, f.parentCategory, f.amount, f.mode, f.source, f.remarks];
+    if (f.scheduleId) {
+      const fin = rs.createTextFinder(id).matchEntireCell(true);
+      const r = fin.findNext();
+      if (r) rs.getRange(r.getRow(), 1, 1, 11).setValues([row]);
+      else throw new Error("ID not found");
+    } else {
+      rs.appendRow(row);
+    }
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function deleteSchedule(id) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const rs=ss.getSheetByName('Recurring'); 
-    const f=rs.createTextFinder(id).matchEntireCell(true); 
-    const r=f.findNext(); 
-    if(r)rs.deleteRow(r.getRow()); 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function deleteSchedule(id) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const rs = ss.getSheetByName('Recurring');
+    const f = rs.createTextFinder(id).matchEntireCell(true);
+    const r = f.findNext();
+    if (r) rs.deleteRow(r.getRow());
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function saveBudget(category,limit) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    let bs=ss.getSheetByName('Budgets'); 
-    if(!bs){ bs=ss.insertSheet('Budgets'); bs.appendRow(['Category','Monthly Limit']); } 
-    const lr=bs.getLastRow(); let found=false; 
-    if(lr>1){ 
-      const data=bs.getRange(2,1,lr-1,1).getValues(); 
-      for(let i=0;i<data.length;i++){ 
-        if(data[i][0]===category){ bs.getRange(i+2,2).setValue(limit); found=true; break; } 
-      } 
-    } 
-    if(!found) bs.appendRow([category,limit]); 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function saveBudget(category, limit) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let bs = ss.getSheetByName('Budgets');
+    if (!bs) { bs = ss.insertSheet('Budgets'); bs.appendRow(['Category', 'Monthly Limit']); }
+    const lr = bs.getLastRow(); let found = false;
+    if (lr > 1) {
+      const data = bs.getRange(2, 1, lr - 1, 1).getValues();
+      for (let i = 0; i < data.length; i++) {
+        if (data[i][0] === category) { bs.getRange(i + 2, 2).setValue(limit); found = true; break; }
+      }
+    }
+    if (!found) bs.appendRow([category, limit]);
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function deleteBudget(category) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const bs=ss.getSheetByName('Budgets'); 
-    if(!bs) return JSON.stringify({success:true}); 
-    const f=bs.createTextFinder(category).matchEntireCell(true); 
-    const r=f.findNext(); 
-    if(r) bs.deleteRow(r.getRow()); 
-    return JSON.stringify({success:true}); 
-  } catch(e) { 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function deleteBudget(category) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const bs = ss.getSheetByName('Budgets');
+    if (!bs) return JSON.stringify({ success: true });
+    const f = bs.createTextFinder(category).matchEntireCell(true);
+    const r = f.findNext();
+    if (r) bs.deleteRow(r.getRow());
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function updateSourceFlags(sourceName,flagType,value) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const s=ss.getSheetByName('Source'); 
-    const lr=s.getLastRow(); 
-    if(lr<2)return JSON.stringify({success:false,message:"No data"}); 
-    const col=flagType==='fav'?7:8; 
-    if(flagType==='def'&&value===true){ s.getRange(2,col,lr-1,1).setValues(new Array(lr-1).fill([false])); } 
-    const f=s.getRange(2,1,lr-1,1).createTextFinder(sourceName).matchEntireCell(true); 
-    const r=f.findNext(); 
-    if(r){ s.getRange(r.getRow(),col).setValue(value); return JSON.stringify({success:true}); } 
-    return JSON.stringify({success:false,message:"Not found"}); 
-  } catch(e){ 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function updateSourceFlags(sourceName, flagType, value) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const s = ss.getSheetByName('Source');
+    const lr = s.getLastRow();
+    if (lr < 2) return JSON.stringify({ success: false, message: "No data" });
+    const col = flagType === 'fav' ? 7 : 8;
+    if (flagType === 'def' && value === true) { s.getRange(2, col, lr - 1, 1).setValues(new Array(lr - 1).fill([false])); }
+    const f = s.getRange(2, 1, lr - 1, 1).createTextFinder(sourceName).matchEntireCell(true);
+    const r = f.findNext();
+    if (r) { s.getRange(r.getRow(), col).setValue(value); return JSON.stringify({ success: true }); }
+    return JSON.stringify({ success: false, message: "Not found" });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function manageSettings(action,params) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const cat=ss.getSheetByName('Categories'); 
-    const src=ss.getSheetByName('Source'); 
-    switch(action){ 
-      case 'addSource': src.appendRow([params.name,params.type||'Bank',0,'','','',false,false]); break; 
-      case 'deleteSource': const sf=src.createTextFinder(params.name).matchEntireCell(true); const sr=sf.findNext(); if(sr)src.deleteRow(sr.getRow()); break; 
-      case 'addParent': cat.getRange(1,cat.getLastColumn()+1).setValue(params.name); break; 
-      case 'addSub': const h=cat.getDataRange().getValues()[0]; const ci=h.indexOf(params.parent); if(ci>-1){ const d=cat.getRange(1,ci+1,cat.getLastRow(),1).getValues().flat(); let lr=0; for(let i=0;i<d.length;i++)if(d[i]!=="")lr=i; cat.getRange(lr+2,ci+1).setValue(params.sub); } break; 
-      case 'deleteSub': const subf=cat.createTextFinder(params.sub).matchEntireCell(true); let subr=subf.findNext(); while(subr){ subr.deleteCells(SpreadsheetApp.Dimension.ROWS); subr=subf.findNext(); } break; 
-    } 
-    return JSON.stringify({success:true}); 
-  } catch(e){ 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function reorderSources(orderedNames) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('Source');
+    const lr = sheet.getLastRow();
+    if (lr < 2) return JSON.stringify({ success: true }); // Nothing to reorder
+
+    const numCols = sheet.getLastColumn();
+    const dataRange = sheet.getRange(2, 1, lr - 1, numCols);
+    const data = dataRange.getValues();
+
+    // Create a map for quick lookup by Source Name (Column 1)
+    const rowMap = {};
+    for (let i = 0; i < data.length; i++) {
+      rowMap[data[i][0]] = data[i];
+    }
+
+    const newRows = [];
+
+    // Add all rows that WERE in orderedNames, in explicit order
+    for (let j = 0; j < orderedNames.length; j++) {
+      const nm = orderedNames[j];
+      if (rowMap[nm]) {
+        newRows.push(rowMap[nm]);
+        delete rowMap[nm]; // Remove so we know what's left behind
+      }
+    }
+
+    // Append any stragglers
+    for (const k in rowMap) {
+      if (rowMap.hasOwnProperty(k)) {
+        newRows.push(rowMap[k]);
+      }
+    }
+
+    // Overwrite the rows in the sheet
+    if (newRows.length > 0) {
+      dataRange.setValues(newRows);
+    }
+
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function reclassifySubCategory(sub,oldParent,newParent) { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const cat=ss.getSheetByName('Categories'); 
-    const exp=ss.getSheetByName('Expenses'); 
-    const cd=cat.getDataRange().getValues(); 
-    const h=cd[0]; 
-    const oi=h.indexOf(oldParent); 
-    if(oi>-1){ 
-      for(let i=1;i<cd.length;i++){ 
-        if(cd[i][oi]===sub){ cat.getRange(i+1,oi+1).deleteCells(SpreadsheetApp.Dimension.ROWS); break; } 
-      } 
-    } 
-    let ni=h.indexOf(newParent); 
-    if(ni===-1){ ni=h.length; cat.getRange(1,ni+1).setValue(newParent); } 
-    const nd=cat.getRange(1,ni+1,cat.getLastRow(),1).getValues().flat(); 
-    let ir=nd.length+1; 
-    for(let i=1;i<nd.length;i++){ if(nd[i]==="") { ir=i+1; break; } } 
-    cat.getRange(ir,ni+1).setValue(sub); 
-    const ed=exp.getDataRange().getValues(); 
-    for(let i=1;i<ed.length;i++){ if(ed[i][3]===sub) exp.getRange(i+1,5).setValue(newParent); } 
-    return JSON.stringify({success:true}); 
-  } catch(e){ 
-    return JSON.stringify({success:false,message:e.toString()}); 
-  } 
+function manageSettings(action, params) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const cat = ss.getSheetByName('Categories');
+    const src = ss.getSheetByName('Source');
+    switch (action) {
+      case 'addSource': src.appendRow([params.name, params.type || 'Bank', 0, '', '', '', false, false]); break;
+      case 'deleteSource': const sf = src.createTextFinder(params.name).matchEntireCell(true); const sr = sf.findNext(); if (sr) src.deleteRow(sr.getRow()); break;
+      case 'addParent': cat.getRange(1, cat.getLastColumn() + 1).setValue(params.name); break;
+      case 'addSub': const h = cat.getDataRange().getValues()[0]; const ci = h.indexOf(params.parent); if (ci > -1) { const d = cat.getRange(1, ci + 1, cat.getLastRow(), 1).getValues().flat(); let lr = 0; for (let i = 0; i < d.length; i++)if (d[i] !== "") lr = i; cat.getRange(lr + 2, ci + 1).setValue(params.sub); } break;
+      case 'deleteSub': const subf = cat.createTextFinder(params.sub).matchEntireCell(true); let subr = subf.findNext(); while (subr) { subr.deleteCells(SpreadsheetApp.Dimension.ROWS); subr = subf.findNext(); } break;
+    }
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function renameParentCategory(oldName, newName) { 
-  const ss = SpreadsheetApp.getActiveSpreadsheet(); 
-  const catSheet = ss.getSheetByName('Categories'); 
-  const catData = catSheet.getDataRange().getValues(); 
-  for(let i=1; i<catData.length; i++) { 
-    if(catData[i][0] === oldName) { catSheet.getRange(i+1, 1).setValue(newName); break; } 
-  } 
-  const expSheet = ss.getSheetByName('Expenses'); 
-  const expData = expSheet.getDataRange().getValues(); 
-  let valuesUpdated = false; 
-  for(let i=1; i<expData.length; i++) { 
-    if(expData[i][4] === oldName) { expData[i][4] = newName; valuesUpdated = true; } 
-  } 
-  if(valuesUpdated) { 
-    expSheet.getRange(1, 1, expData.length, expData[0].length).setValues(expData); 
-  } 
+function reclassifySubCategory(sub, oldParent, newParent) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const cat = ss.getSheetByName('Categories');
+    const exp = ss.getSheetByName('Expenses');
+    const cd = cat.getDataRange().getValues();
+    const h = cd[0];
+    const oi = h.indexOf(oldParent);
+    if (oi > -1) {
+      for (let i = 1; i < cd.length; i++) {
+        if (cd[i][oi] === sub) { cat.getRange(i + 1, oi + 1).deleteCells(SpreadsheetApp.Dimension.ROWS); break; }
+      }
+    }
+    let ni = h.indexOf(newParent);
+    if (ni === -1) { ni = h.length; cat.getRange(1, ni + 1).setValue(newParent); }
+    const nd = cat.getRange(1, ni + 1, cat.getLastRow(), 1).getValues().flat();
+    let ir = nd.length + 1;
+    for (let i = 1; i < nd.length; i++) { if (nd[i] === "") { ir = i + 1; break; } }
+    cat.getRange(ir, ni + 1).setValue(sub);
+    const ed = exp.getDataRange().getValues();
+    for (let i = 1; i < ed.length; i++) { if (ed[i][3] === sub) exp.getRange(i + 1, 5).setValue(newParent); }
+    return JSON.stringify({ success: true });
+  } catch (e) {
+    return JSON.stringify({ success: false, message: e.toString() });
+  }
 }
 
-function deleteParentCategory(name) { 
-  const ss = SpreadsheetApp.getActiveSpreadsheet(); 
-  const catSheet = ss.getSheetByName('Categories'); 
-  const data = catSheet.getDataRange().getValues(); 
-  for(let i=1; i<data.length; i++) { 
-    if(data[i][0] === name) { catSheet.deleteRow(i+1); break; } 
-  } 
+function renameParentCategory(oldName, newName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const catSheet = ss.getSheetByName('Categories');
+  const catData = catSheet.getDataRange().getValues();
+  for (let i = 1; i < catData.length; i++) {
+    if (catData[i][0] === oldName) { catSheet.getRange(i + 1, 1).setValue(newName); break; }
+  }
+  const expSheet = ss.getSheetByName('Expenses');
+  const expData = expSheet.getDataRange().getValues();
+  let valuesUpdated = false;
+  for (let i = 1; i < expData.length; i++) {
+    if (expData[i][4] === oldName) { expData[i][4] = newName; valuesUpdated = true; }
+  }
+  if (valuesUpdated) {
+    expSheet.getRange(1, 1, expData.length, expData[0].length).setValues(expData);
+  }
 }
 
-function processRecurringTransactions() { 
-  try { 
-    const ss=SpreadsheetApp.getActiveSpreadsheet(); 
-    const rs=ss.getSheetByName('Recurring'); 
-    const es=ss.getSheetByName('Expenses'); 
-    const lr=rs.getLastRow(); 
-    if(lr<2)return; 
-    const rng=rs.getRange(2,1,lr-1,11); 
-    const data=rng.getValues(); 
-    const today=new Date(); today.setHours(0,0,0,0); 
-    data.forEach((r,i)=>{ 
-      let n=new Date(r[2]); n.setHours(0,0,0,0); 
-      const end=r[3]?new Date(r[3]):null; 
-      if(end)end.setHours(0,0,0,0); 
-      if(end&&today>end)return; 
-      if(today>=n){ 
-        const tid="TXN-AUTO-"+today.getTime()+"-"+i; 
+function deleteParentCategory(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const catSheet = ss.getSheetByName('Categories');
+  const data = catSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === name) { catSheet.deleteRow(i + 1); break; }
+  }
+}
+
+function processRecurringTransactions() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const rs = ss.getSheetByName('Recurring');
+    const es = ss.getSheetByName('Expenses');
+    const lr = rs.getLastRow();
+    if (lr < 2) return;
+    const rng = rs.getRange(2, 1, lr - 1, 11);
+    const data = rng.getValues();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    data.forEach((r, i) => {
+      let n = new Date(r[2]); n.setHours(0, 0, 0, 0);
+      const end = r[3] ? new Date(r[3]) : null;
+      if (end) end.setHours(0, 0, 0, 0);
+      if (end && today > end) return;
+      if (today >= n) {
+        const tid = "TXN-AUTO-" + today.getTime() + "-" + i;
         // FIX: Use the Scheduled Date (n) instead of Today for the log, so it's accurate even if script runs late
-        const ds=Utilities.formatDate(n,ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
-        es.appendRow([tid,ds,r[4],r[5],r[6],r[7],r[8],r[9],r[10]+" (Auto)"]); 
-        if(r[1]==='One-Time'){ 
-          data[i][3]=Utilities.formatDate(new Date(today.getTime()-86400000),ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
-        }else{ 
-          let nd=new Date(n); 
-          switch(r[1]){ 
-            case 'Daily':nd.setDate(nd.getDate()+1);break; 
-            case 'Weekly':nd.setDate(nd.getDate()+7);break; 
-            case 'Monthly':nd.setMonth(nd.getMonth()+1);break; 
-            case 'Semi-Annually':nd.setMonth(nd.getMonth()+6);break; 
-            case 'Annually':nd.setFullYear(nd.getFullYear()+1);break; 
-          } 
-          data[i][2]=Utilities.formatDate(nd,ss.getSpreadsheetTimeZone(),"yyyy-MM-dd"); 
-        } 
-      } 
-    }); 
-    rng.setValues(data); 
-    const elr=es.getLastRow(); 
-    if(elr>1)es.getRange(2,1,elr-1,9).sort({column:2,ascending:false}); 
-  } catch(e){ 
-    Logger.log(e); 
-  } 
+        const ds = Utilities.formatDate(n, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+        es.appendRow([tid, ds, r[4], r[5], r[6], r[7], r[8], r[9], r[10] + " (Auto)"]);
+        if (r[1] === 'One-Time') {
+          data[i][3] = Utilities.formatDate(new Date(today.getTime() - 86400000), ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+        } else {
+          let nd = new Date(n);
+          switch (r[1]) {
+            case 'Daily': nd.setDate(nd.getDate() + 1); break;
+            case 'Weekly': nd.setDate(nd.getDate() + 7); break;
+            case 'Monthly': nd.setMonth(nd.getMonth() + 1); break;
+            case 'Semi-Annually': nd.setMonth(nd.getMonth() + 6); break;
+            case 'Annually': nd.setFullYear(nd.getFullYear() + 1); break;
+          }
+          data[i][2] = Utilities.formatDate(nd, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+        }
+      }
+    });
+    rng.setValues(data);
+    const elr = es.getLastRow();
+    if (elr > 1) es.getRange(2, 1, elr - 1, 9).sort({ column: 2, ascending: false });
+  } catch (e) {
+    Logger.log(e);
+  }
 }
 
-function createDailyTrigger() { 
-  const t=ScriptApp.getProjectTriggers(); 
-  t.forEach(x=>{ if(x.getHandlerFunction()==='processRecurringTransactions') ScriptApp.deleteTrigger(x); }); 
-  ScriptApp.newTrigger('processRecurringTransactions').timeBased().everyDays(1).atHour(1).create(); 
+function createDailyTrigger() {
+  const t = ScriptApp.getProjectTriggers();
+  t.forEach(x => { if (x.getHandlerFunction() === 'processRecurringTransactions') ScriptApp.deleteTrigger(x); });
+  ScriptApp.newTrigger('processRecurringTransactions').timeBased().everyDays(1).atHour(1).create();
 }
 function deleteBulkTransactions(ids) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('Expenses');
   const data = sheet.getDataRange().getValues();
-  
+
   // We process deletion from bottom to top to preserve indices
   // or easier: just mark rows to delete and delete them in one go if possible,
   // but row deletion is slow. 
   // Faster approach: Filter the array and write back (if dataset isn't huge).
   // Safest approach for IDs:
-  
+
   // 1. Map IDs to Row Numbers (1-based)
   let rowsToDelete = [];
   // Skip header (i=1)
@@ -616,13 +662,13 @@ function deleteBulkTransactions(ids) {
       rowsToDelete.push(i + 1);
     }
   }
-  
+
   // 2. Delete rows (Reverse order to avoid index shifting)
   rowsToDelete.sort((a, b) => b - a);
   rowsToDelete.forEach(row => {
     sheet.deleteRow(row);
   });
-  
+
   return "Success";
 }
 
@@ -630,12 +676,12 @@ function updateBulkCategory(ids, newParent, newSub) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('Expenses');
   const data = sheet.getDataRange().getValues();
-  
+
   // Columns indices (0-based)
   const COL_ID = 0;
   const COL_SUB = 3;    // Check your schema: usually Sub-Category is col 3
   const COL_PARENT = 4; // Check your schema: usually Parent is col 4
-  
+
   for (let i = 1; i < data.length; i++) {
     if (ids.includes(data[i][COL_ID])) {
       // Direct cell update is slow. Better to update array and write back batch if many.
@@ -645,7 +691,7 @@ function updateBulkCategory(ids, newParent, newSub) {
       sheet.getRange(i + 1, COL_PARENT + 1).setValue(newParent);
     }
   }
-  
+
   return "Success";
 }
 
