@@ -1,0 +1,9 @@
+# Don't commit your local keys file (Supabase keys are in ExpTracker-6.html for deployment)
+my-supabase-keys.txt
+
+# OS and editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
