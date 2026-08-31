@@ -237,10 +237,44 @@
             font-family: 'Work Sans', sans-serif;
         }
 
+        .dark {
+            color-scheme: dark;
+        }
+
         .dark .compact-input {
             background-color: rgba(6, 11, 23, 0.85);
             border-color: rgba(255, 255, 255, 0.1);
             color: #f3f4f6;
+            color-scheme: dark;
+        }
+
+        html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+        html.dark input[type="month"]::-webkit-calendar-picker-indicator,
+        html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+        html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+        .dark input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark input[type="month"]::-webkit-calendar-picker-indicator,
+        .dark input[type="time"]::-webkit-calendar-picker-indicator,
+        .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2334d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            cursor: pointer !important;
+            opacity: 0.9 !important;
+            filter: none !important;
+        }
+
+        html.dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        html.dark input[type="month"]::-webkit-calendar-picker-indicator:hover,
+        html.dark input[type="time"]::-webkit-calendar-picker-indicator:hover,
+        html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+        .dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        .dark input[type="month"]::-webkit-calendar-picker-indicator:hover,
+        .dark input[type="time"]::-webkit-calendar-picker-indicator:hover,
+        .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1 !important;
+            filter: brightness(1.2) drop-shadow(0 0 4px rgba(52, 211, 153, 0.5)) !important;
         }
 
         .compact-label {
@@ -3282,6 +3316,36 @@
         }
 
         function handleShortcuts(e) {
+            if (e.key === 'Escape') {
+                // Priority: Close active modal overlays without saving
+                const bpModal = document.getElementById('budgetPlannerModal');
+                if (bpModal && !bpModal.classList.contains('hidden')) {
+                    closeBudgetPlanner();
+                    return;
+                }
+                const bpCatModal = document.getElementById('budgetCatModal');
+                if (bpCatModal && !bpCatModal.classList.contains('hidden')) {
+                    closeSetBudgetCategoriesModal();
+                    return;
+                }
+                const globalSearch = document.getElementById('globalSearchOverlay');
+                if (globalSearch && !globalSearch.classList.contains('hidden')) {
+                    closeGlobalSearch();
+                    return;
+                }
+                const scModal = document.getElementById('shortcutHelpModal');
+                if (scModal && !scModal.classList.contains('hidden')) {
+                    closeShortcutHelpModal();
+                    return;
+                }
+                // Generic handler for other visible modal backdrops
+                const openModals = Array.from(document.querySelectorAll('.fixed.inset-0:not(.hidden)')).filter(m => m.id !== 'splash');
+                if (openModals.length > 0) {
+                    openModals[openModals.length - 1].classList.add('hidden');
+                    return;
+                }
+            }
+
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key.toLowerCase()) {
                     case 'k':
@@ -3812,16 +3876,15 @@
                 const staggerClass = (i < 5) ? ` animate-fade-slide-in stagger-${i + 1}` : '';
 
                 tbody.innerHTML += `
-        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition ${rowBg}${staggerClass}">
+        <tr id="pending-row-${item.id}" onclick="selectPendingRow('${item.id}')" class="border-b dark:border-gray-700 hover:bg-emerald-50/50 dark:hover:bg-white/[0.04] transition cursor-pointer group ${rowBg}${staggerClass}">
           <td class="p-3 font-medium ${dateClass}">${item.expectedDate}${overdueBadge}</td>
           <td class="p-3 font-semibold text-gray-800 dark:text-gray-200">${item.description}</td>
           <td class="p-3 font-mono font-bold text-gray-800 dark:text-gray-100">₹${Number(item.amount).toLocaleString('en-IN')}</td>
           <td class="p-3 text-xs text-gray-500"><small>${flowStr}</small></td>
-          <td class="p-3 flex flex-wrap gap-1 justify-center">
+          <td class="p-3 flex flex-wrap gap-1 justify-center" onclick="event.stopPropagation()">
             <button onclick="initiateApprove('${item.id}')" class="text-green-600 hover:text-green-800 p-1 bg-green-50 dark:bg-green-900/30 rounded" title="Full receive"><i data-feather="check-circle" class="w-4 h-4"></i></button>
             <button onclick="openPartialReceiveModal('${item.id}')" class="text-amber-600 hover:text-amber-800 p-1 bg-amber-50 dark:bg-amber-900/30 rounded" title="Partial receive"><i data-feather="percent" class="w-4 h-4"></i></button>
-            <button onclick="initiateEdit('${item.id}')" class="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 dark:bg-blue-900/30 rounded"><i data-feather="edit-2" class="w-4 h-4"></i></button>
-            <button onclick="deletePendingItem('${item.id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+            <button onclick="deletePendingItem('${item.id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded" title="Delete"><i data-feather="trash-2" class="w-4 h-4"></i></button>
           </td>
         </tr>`;
             });
@@ -3996,6 +4059,17 @@
             });
         }
 
+        function selectPendingRow(id) {
+            document.querySelectorAll('#pendingTableBody tr').forEach(r => {
+                r.classList.remove('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            });
+            const row = document.getElementById(`pending-row-${id}`);
+            if (row) {
+                row.classList.add('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            }
+            initiateEdit(id);
+        }
+
         function initiateEdit(id) {
             const item = pendingItemsMap[id];
             if (!item) return showToast("Error: Item not found", 'error');
@@ -4024,6 +4098,9 @@
         }
 
         function resetPendingForm() {
+            document.querySelectorAll('#pendingTableBody tr').forEach(r => {
+                r.classList.remove('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            });
             document.getElementById('pendingForm').reset();
             document.getElementById('pendingId').value = "";
             document.getElementById('pendComment').value = "";
@@ -6370,7 +6447,7 @@
                     <div class="w-24 text-right pr-2 border-r-2 border-gray-300 dark:border-white/15 truncate text-gray-600 dark:text-gray-400 font-medium" title="${subName}">${subName}</div>
                     <div class="flex-1 px-2">
                         <div class="w-full bg-gray-100 dark:bg-white/5 h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-teal-400/80 h-1.5 rounded-full" style="width:${subPct}%"></div>
+                            <div class="bg-gradient-to-r from-blue-500 to-indigo-400 h-1.5 rounded-full" style="width:${subPct}%"></div>
                         </div>
                     </div>
                     <div class="w-16 text-right font-mono text-gray-500 dark:text-gray-400">₹${fmtMoney(subAmt)}</div>
@@ -8362,7 +8439,7 @@
                 let savingsActual = 0;
 
                 allAllocations.forEach(a => {
-                    const target = a.amount;
+                    const target = Number(a.amount) || 0;
                     const bucketName = a.category.toLowerCase().trim();
                     const parent = getParentForSubCategory(a.category);
                     const isSavings = parent === 'Savings' || parent === 'Investments';
@@ -8377,16 +8454,33 @@
                         expenseActual += spent;
                     }
 
-                    const isOver = spent > target;
+                    const isSavingsTargetMet = isSavings && target > 0 && spent >= target;
+                    const isExpenseTargetMet = !isSavings && target > 0 && spent >= target;
+                    const isOver = !isSavings && target > 0 && spent > target;
                     const diff = Math.abs(spent - target);
+
+                    let catColorClass = 'text-gray-700 dark:text-gray-300';
+                    let spentColorClass = 'text-gray-500 dark:text-gray-400 font-mono';
+
+                    if (isSavings) {
+                        if (isSavingsTargetMet) {
+                            catColorClass = 'text-green-600 dark:text-green-400 font-semibold';
+                            spentColorClass = 'text-green-600 dark:text-green-400 font-bold font-mono';
+                        }
+                    } else {
+                        if (isExpenseTargetMet) {
+                            catColorClass = 'text-red-600 dark:text-red-400 font-semibold';
+                            spentColorClass = 'text-red-600 dark:text-red-400 font-bold font-mono';
+                        }
+                    }
 
                     const html = `
                         <div class="flex justify-between items-center text-xs py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                            <div class="flex-1 font-medium text-gray-700 dark:text-gray-300">${a.category}</div>
+                            <div class="flex-1 font-medium ${catColorClass}">${a.category}</div>
                             <div class="text-right">
                                 <div class="text-[10px] text-gray-400">Target: ₹${target.toLocaleString('en-IN')}</div>
-                                <div class="font-bold font-mono ${isOver ? 'text-red-600' : 'text-green-600'}">${isSavings ? 'Saved' : 'Spent'}: ₹${spent.toLocaleString('en-IN')}</div>
-                                ${isOver && !isSavings ? `<div class="text-[9px] text-red-500 font-bold">Exceeded by ₹${diff.toLocaleString('en-IN')}</div>` : ''}
+                                <div class="${spentColorClass}">${isSavings ? 'Saved' : 'Spent'}: ₹${spent.toLocaleString('en-IN')}</div>
+                                ${isOver ? `<div class="text-[9px] text-red-500 font-bold">Exceeded by ₹${diff.toLocaleString('en-IN')}</div>` : ''}
                             </div>
                         </div>
                     `;
