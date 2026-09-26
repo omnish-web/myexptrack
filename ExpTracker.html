@@ -17,9 +17,16 @@
         body {
             font-family: 'Work Sans', sans-serif;
             transition: color .3s, background-color .3s;
-            background-color: #e9ecf0;
-            background-image: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.03) 0%, rgba(233, 236, 240, 0.95) 50%, rgba(223, 227, 234, 1) 100%);
-            color: #1e293b;
+            background-color: #dbe5f1;
+            background-image: 
+                radial-gradient(at 10% 12%, rgba(16, 185, 129, 0.18) 0px, transparent 40%),
+                radial-gradient(at 90% 8%, rgba(6, 182, 212, 0.18) 0px, transparent 45%),
+                radial-gradient(at 80% 88%, rgba(99, 102, 241, 0.15) 0px, transparent 45%),
+                radial-gradient(at 12% 90%, rgba(20, 184, 166, 0.16) 0px, transparent 45%),
+                radial-gradient(at 50% 45%, rgba(245, 250, 255, 0.75) 0%, transparent 60%),
+                linear-gradient(135deg, #dce6f2 0%, #e9f1f8 40%, #d5e1ee 100%);
+            background-attachment: fixed;
+            color: #0f172a;
         }
 
         .dark body {
@@ -29,21 +36,94 @@
         }
 
         .glass-panel {
-            backdrop-filter: blur(16px);
-            border-radius: 1rem;
-            transition: all .3s ease;
-            background: rgba(246, 248, 250, 0.85);
-            border: 1px solid rgba(203, 213, 225, 0.65);
-            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-            color: #1e293b;
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border-radius: 1.15rem;
+            transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(242, 247, 254, 0.48) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.90);
+            box-shadow: 
+                0 16px 36px -8px rgba(15, 23, 42, 0.07),
+                0 4px 12px -2px rgba(15, 23, 42, 0.03),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.4);
+            color: #0f172a;
         }
 
         .dark .glass-panel {
             background: rgba(8, 13, 26, 0.90);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
             color: #f3f4f6;
+        }
+
+        /* Glass card sub-containers & nested panels */
+        .glass-sub-card {
+            background: rgba(255, 255, 255, 0.60);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+            border-radius: 0.85rem;
+        }
+        .dark .glass-sub-card {
+            background: rgba(13, 20, 36, 0.60);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+        }
+
+        /* Balance Ticker interactive glass buttons */
+        #balanceTicker button {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(245, 248, 252, 0.65) 100%) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.90) !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #balanceTicker button:hover {
+            background: rgba(255, 255, 255, 0.98) !important;
+            transform: translateY(-1.5px) !important;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        }
+        .dark #balanceTicker button {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+        }
+        .dark #balanceTicker button:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Frosted Split Containers */
+        #divExpenseSplits {
+            background: linear-gradient(135deg, rgba(254, 242, 242, 0.78) 0%, rgba(255, 228, 230, 0.48) 100%) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(244, 63, 94, 0.22) !important;
+            box-shadow: 0 4px 16px rgba(244, 63, 94, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+        }
+        .dark #divExpenseSplits {
+            background: rgba(136, 19, 55, 0.20) !important;
+            border-color: rgba(244, 63, 94, 0.3) !important;
+            box-shadow: none !important;
+        }
+
+        #divTransferDestinations {
+            background: linear-gradient(135deg, rgba(240, 253, 244, 0.78) 0%, rgba(204, 251, 241, 0.48) 100%) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(16, 185, 129, 0.22) !important;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+        }
+        .dark #divTransferDestinations {
+            background: rgba(6, 78, 59, 0.20) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            box-shadow: none !important;
         }
 
         .nav-item {
@@ -65,14 +145,14 @@
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(20, 184, 166, 0.10)) !important;
-            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.88)) !important;
+            border: 1px solid rgba(16, 185, 129, 0.35) !important;
             color: #047857 !important;
-            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08) !important;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
         }
 
         .nav-item.active:hover {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.16)) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(236, 253, 243, 0.95)) !important;
             color: #065f46 !important;
         }
 
@@ -85,8 +165,10 @@
 
         .nav-item:not(.active):hover {
             color: #059669 !important;
-            background-color: rgba(16, 185, 129, 0.08) !important;
-            border-color: transparent !important;
+            background-color: rgba(255, 255, 255, 0.60) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-color: rgba(255, 255, 255, 0.7) !important;
         }
 
         .dark .nav-item.active {
@@ -136,12 +218,15 @@
         }
 
         .btn-secondary {
-            background-color: rgba(235, 239, 244, 0.9) !important;
+            background-color: rgba(255, 255, 255, 0.70) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
             color: #334155 !important;
             font-weight: 600;
-            border: 1px solid rgba(203, 213, 225, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.90) !important;
             border-radius: 0.75rem;
             transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.98) !important;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -150,12 +235,15 @@
         }
         .dark .btn-secondary {
             background-color: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(12px) !important;
             color: #e2e8f0 !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
         }
         .btn-secondary:hover {
-            background-color: rgba(220, 226, 235, 0.95) !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
             color: #0f172a !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
         }
         .dark .btn-secondary:hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
@@ -212,29 +300,40 @@
         }
 
         .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
         }
 
         .custom-scroll::-webkit-scrollbar-thumb {
-            background: rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, 0.30);
             border-radius: 10px;
         }
 
         .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(16, 185, 129, 0.45);
+            background: rgba(16, 185, 129, 0.55);
         }
 
         .compact-input {
             width: 100%;
-            padding: .5rem;
+            padding: .5rem .65rem;
             font-size: 14px;
-            border-radius: .5rem;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
+            border-radius: .6rem;
+            border: 1px solid rgba(203, 213, 225, 0.85);
+            background-color: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             color: #0f172a;
             outline: none;
             font-family: 'Work Sans', sans-serif;
+            box-shadow: inset 0 1.5px 3px rgba(15, 23, 42, 0.03), 0 1px 0 rgba(255, 255, 255, 0.9);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .compact-input:focus {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-color: #10b981;
+            box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.20), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            transform: translateY(-1px);
         }
 
         .dark {
@@ -246,6 +345,7 @@
             border-color: rgba(255, 255, 255, 0.1);
             color: #f3f4f6;
             color-scheme: dark;
+            box-shadow: none;
         }
 
         html.dark input[type="date"]::-webkit-calendar-picker-indicator,
@@ -281,11 +381,11 @@
             display: block;
             font-size: .65rem;
             font-weight: 700;
-            color: #64748b;
+            color: #475569;
             text-transform: uppercase;
-            margin-bottom: .2rem;
+            margin-bottom: .25rem;
             font-family: 'Work Sans', sans-serif;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
         }
 
         .dark .compact-label {
@@ -311,6 +411,94 @@
         .status-overdue {
             color: #ef4444;
             font-weight: bold;
+        }
+
+        /* Frosted Glass Elements & Nested Cards */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(245, 248, 252, 0.52) 100%);
+            backdrop-filter: blur(24px) saturate(190%);
+            -webkit-backdrop-filter: blur(24px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.90);
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        }
+        .dark .glass-card {
+            background: rgba(8, 13, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Glass Table Headers & Strips */
+        th.bg-slate-200,
+        tr.bg-slate-200,
+        .bg-slate-200 {
+            background-color: rgba(235, 241, 248, 0.75) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+        }
+        .dark th.bg-slate-200,
+        .dark tr.bg-slate-200,
+        .dark .bg-slate-200 {
+            background-color: #070d1a !important;
+        }
+
+        /* Modal Dialog Glassmorphism */
+        .modal-glass-container,
+        .bg-\[\#f8fafc\] {
+            backdrop-filter: blur(28px) saturate(190%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.90) 0%, rgba(246, 249, 253, 0.80) 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.2), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+        }
+        .dark .modal-glass-container,
+        .dark .bg-\[\#f8fafc\] {
+            background: rgba(8, 13, 26, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        /* Modal Glass Backdrops */
+        .modal-glass-backdrop,
+        .fixed.inset-0.bg-black\/50,
+        .fixed.inset-0.bg-black\/60,
+        .fixed.inset-0.bg-black.bg-opacity-50 {
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+            background-color: rgba(15, 23, 42, 0.40) !important;
+        }
+        .dark .modal-glass-backdrop,
+        .dark .fixed.inset-0.bg-black\/50,
+        .dark .fixed.inset-0.bg-black\/60,
+        .dark .fixed.inset-0.bg-black.bg-opacity-50 {
+            background-color: rgba(3, 7, 18, 0.75) !important;
+        }
+
+        /* Mode & view segmented pill controls */
+        .bg-gray-100 {
+            background-color: rgba(226, 232, 240, 0.6) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .dark .bg-gray-100 {
+            background-color: rgba(31, 41, 55, 0.8) !important;
+        }
+
+        /* Active toggle pills inside containers */
+        button.bg-white,
+        .bg-white.shadow {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 249, 253, 0.90)) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+            color: #0f172a !important;
+        }
+        .dark button.bg-white,
+        .dark .bg-white.shadow {
+            background: rgba(55, 65, 81, 1) !important;
+            color: #f3f4f6 !important;
+            box-shadow: none !important;
         }
 
         /* --- Micro-Interactions & Animations --- */
@@ -1106,8 +1294,8 @@
                             </div>
                             <div>
                                 <label class="compact-label">Comment (optional)</label>
-                                <textarea id="pendComment" class="compact-input text-xs resize-y py-1.5" rows="2"
-                                    placeholder="Add any notes here..."></textarea>
+                                <textarea id="pendComment" class="compact-input text-xs resize-y py-2 px-2.5 min-h-[95px] leading-relaxed custom-scroll" rows="4"
+                                    placeholder="Add any notes, breakups, or details here..."></textarea>
                             </div>
                             <div
                                 class="bg-emerald-50/70 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
@@ -1214,19 +1402,23 @@
                                 </div>
                                 <div>
                                     <label class="compact-label">Payment Mode</label>
-                                    <select name="mode" id="schMode" class="compact-input py-1 text-xs">
-                                        <option value="Cashless">Cashless</option>
+                                    <select name="mode" id="schMode" onchange="refreshScheduleSources()" class="compact-input py-1 text-xs">
+                                        <option value="Cashless" selected>Cashless</option>
                                         <option value="Cash">Cash</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="compact-label">First Start Date</label>
+                                    <input type="date" name="firstStartDate" id="schFirstDate" required class="compact-input py-1 text-xs" onchange="handleSchFirstDateChange(this.value)">
+                                </div>
                                 <div>
                                     <label class="compact-label">Next Due Date</label>
                                     <input type="date" name="startDate" id="schStartDate" required class="compact-input py-1 text-xs">
                                 </div>
                                 <div>
-                                    <label class="compact-label">Sunset Date (Optional)</label>
+                                    <label class="compact-label">Sunset Date (Opt)</label>
                                     <input type="date" name="endDate" id="schEndDate" class="compact-input py-1 text-xs">
                                 </div>
                             </div>
@@ -1240,8 +1432,8 @@
                                 </div>
                                 <div>
                                     <label class="compact-label">Txn Type</label>
-                                    <select name="type" id="schType" class="compact-input py-1 text-xs">
-                                        <option value="Expense">Expense</option>
+                                    <select name="type" id="schType" onchange="refreshScheduleDatalist(); handleSchSubInput(document.getElementById('schSub'))" class="compact-input py-1 text-xs">
+                                        <option value="Expense" selected>Expense</option>
                                         <option value="Income">Income</option>
                                         <option value="Transfer">Transfer</option>
                                     </select>
@@ -1301,6 +1493,7 @@
                                     class="bg-gray-100 dark:bg-gray-700 sticky top-0 z-10 text-gray-600 dark:text-gray-300 font-bold uppercase">
                                     <tr>
                                         <th class="p-3">Freq</th>
+                                        <th class="p-3">First Start</th>
                                         <th class="p-3">Next Due</th>
                                         <th class="p-3">Category</th>
                                         <th class="p-3">Amount</th>
@@ -2676,7 +2869,16 @@
                     return supabase.from('recurring').select('id, frequency, start_date, end_date, type, sub, parent, amount, mode, source, remarks').eq('user_id', uid);
                 })
                 .then(function (recRes) {
-                    if (recRes.data) out.scheduled = recRes.data.map(function (r) { return [r.id, r.frequency || '', fmtDate(r.start_date), fmtDate(r.end_date), r.type || '', r.sub || '', r.parent || '', Number(r.amount), r.mode || '', r.source || '', r.remarks || '']; });
+                    if (recRes.data) out.scheduled = recRes.data.map(function (r) {
+                        var rem = r.remarks || '';
+                        var firstStart = fmtDate(r.start_date);
+                        var startMatch = rem.match(/\[Start:\s*(\d{4}-\d{2}-\d{2})\]/i);
+                        if (startMatch && startMatch[1]) {
+                            firstStart = startMatch[1];
+                            rem = rem.replace(/\[Start:\s*(\d{4}-\d{2}-\d{2})\]/i, '').trim();
+                        }
+                        return [r.id, r.frequency || '', fmtDate(r.start_date), fmtDate(r.end_date), r.type || '', r.sub || '', r.parent || '', Number(r.amount), r.mode || '', r.source || '', rem, firstStart];
+                    });
                     return supabase.from('budgets').select('category_key, limit_amount').eq('user_id', uid);
                 })
                 .then(function (budRes) {
@@ -2921,7 +3123,11 @@
             var supabase = getSupabaseClient();
             if (!supabase || !supabaseUserId) return Promise.reject(new Error('Not signed in'));
             var id = p.scheduleId || ('SCH-' + new Date().getTime());
-            var row = { id: id, user_id: supabaseUserId, frequency: p.frequency, start_date: p.startDate, end_date: p.endDate || null, type: p.type, sub: p.subCategory || '', parent: p.parentCategory || '', amount: Number(p.amount), mode: p.mode || '', source: p.source || '', remarks: p.remarks || '' };
+            var rem = p.remarks || '';
+            if (p.firstStartDate) {
+                rem = (rem ? rem + ' ' : '') + '[Start: ' + p.firstStartDate + ']';
+            }
+            var row = { id: id, user_id: supabaseUserId, frequency: p.frequency, start_date: p.startDate, end_date: p.endDate || null, type: p.type, sub: p.subCategory || '', parent: p.parentCategory || '', amount: Number(p.amount), mode: p.mode || '', source: p.source || '', remarks: rem };
             if (p.scheduleId) {
                 return supabase.from('recurring').update({ frequency: row.frequency, start_date: row.start_date, end_date: row.end_date, type: row.type, sub: row.sub, parent: row.parent, amount: row.amount, mode: row.mode, source: row.source, remarks: row.remarks }).eq('user_id', supabaseUserId).eq('id', id).then(function (res) {
                     if (res.error) return Promise.reject(new Error(res.error.message));
@@ -3541,6 +3747,8 @@
                 buildSearchIndex();
                 refreshAllDatalists();
                 refreshTransferDropdowns();
+                refreshScheduleDatalist();
+                refreshScheduleSources();
                 populateFilterDropdowns();
                 populateRemarksDatalist();
                 calculateLiveBalances();
@@ -3705,6 +3913,10 @@
                 renderAssetsDashboard();
             } else if (tabName === 'settings') {
                 if (typeof renderSettingsUI === 'function') renderSettingsUI();
+            } else if (tabName === 'scheduled') {
+                if (typeof refreshScheduleDatalist === 'function') refreshScheduleDatalist();
+                if (typeof refreshScheduleSources === 'function') refreshScheduleSources();
+                if (typeof renderScheduledTable === 'function') renderScheduledTable();
             }
         }
 
@@ -4483,26 +4695,74 @@
         // ==========================================
         // 4. REST OF STANDARD FUNCTIONS
         // ==========================================
-        function handleSchSubInput(i) {
-            const v = i.value;
-            const p = document.getElementById('schParent'); // Targets the specific Scheduled Parent field
-            let f = "";
-
-            // Search your categories data
-            for (const [k, vals] of Object.entries(appData.categories)) {
-                if (Array.isArray(vals) && vals.map(String).includes(v)) {
-                    f = k;
-                    break;
+        function refreshScheduleSources() {
+            const el = document.getElementById('schSource');
+            if (!el) return;
+            const modeEl = document.getElementById('schMode');
+            const filter = (modeEl && modeEl.value === 'Cash') ? 'Cash' : 'Cashless';
+            const existingVal = el.value;
+            el.innerHTML = '<option value="" disabled selected>Select Account...</option>';
+            if (appData && appData.sources) {
+                appData.sources.forEach(s => {
+                    const n = Array.isArray(s) ? s[0] : s;
+                    const type = Array.isArray(s) ? (s[1] || 'Bank') : 'Bank';
+                    if (filter === 'Cash') {
+                        if (type === 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`;
+                    } else {
+                        if (type !== 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`;
+                    }
+                });
+            }
+            if (existingVal && Array.from(el.options).some(o => o.value === existingVal)) {
+                el.value = existingVal;
+            }
+        }
+        function refreshScheduleDatalist() {
+            const typeEl = document.getElementById('schType');
+            const t = (typeEl && typeEl.value) || 'Expense';
+            const dl = document.getElementById('schSubList');
+            if (!dl) return;
+            dl.innerHTML = '';
+            const added = new Set();
+            for (const [p, subs] of Object.entries(appData.categories || {})) {
+                if ((t === 'Income' && p !== 'Income') || (t !== 'Income' && p === 'Income')) continue;
+                if (Array.isArray(subs)) {
+                    subs.forEach(s => {
+                        if (!added.has(s)) {
+                            const o = document.createElement('option');
+                            o.value = s;
+                            dl.appendChild(o);
+                            added.add(s);
+                        }
+                    });
                 }
             }
-
-            p.value = f;
         }
-        function refreshTransferDropdowns() { const mode = document.getElementById('inpMode').value; const filter = mode === 'Cash' ? 'Cash' : 'Cashless';['inpTransferSource', 'schSource', 'bulkGlobalSource', 'pendIncAccount'].forEach(id => { const el = document.getElementById(id); if (!el) return; const existingVal = el.value; let defaultText = id === 'bulkGlobalSource' ? "Select Source..." : "Select Account..."; el.innerHTML = `<option value="" disabled selected>${defaultText}</option>`; if (appData && appData.sources) { appData.sources.forEach(s => { const n = Array.isArray(s) ? s[0] : s; const type = Array.isArray(s) ? (s[1] || 'Bank') : 'Bank'; if (filter === 'Cash') { if (type === 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`; } else { if (type !== 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`; } }); } if (existingVal && Array.from(el.options).some(o => o.value === existingVal)) el.value = existingVal; else el.value = ''; }); }
-        function populateFilterDropdowns() { const p = document.getElementById('filterParent'), s = document.getElementById('filterSub'), src = document.getElementById('filterSource'), m = document.getElementById('modalParentList'), b = document.getElementById('budgetCat'), bulkP = document.getElementById('bulkParent'); if (!appData || !appData.categories) return; if (p) { p.innerHTML = '<option value="">All Parents</option>'; Object.keys(appData.categories).sort().forEach(k => p.innerHTML += `<option value="${k}">${k}</option>`); } if (s) { updateSubFilter(); } if (src) { src.innerHTML = '<option value="">All Sources</option>'; (appData.sources || []).forEach(r => { let n = Array.isArray(r) ? r[0] : r; src.innerHTML += `<option value="${n}">${n}</option>`; }); } if (m) { m.innerHTML = ''; Object.keys(appData.categories).sort().forEach(k => m.innerHTML += `<option value="${k}">`); } if (b) { b.innerHTML = '<option value="">Select Category</option>'; Object.keys(appData.categories).sort().forEach(function (par) { if (par === 'Income') return; b.innerHTML += `<option value="${par}">${par} (parent)</option>`; (appData.categories[par] || []).forEach(function (sub) { b.innerHTML += `<option value="${par}|${sub}">${par} › ${sub}</option>`; }); }); } if (bulkP) { bulkP.innerHTML = '<option value="" disabled selected>Select Parent...</option>'; Object.keys(appData.categories).sort().forEach(k => bulkP.innerHTML += `<option value="${k}">${k}</option>`); } const incList = document.getElementById('incomeSubList'); if (incList && appData.categories['Income']) { incList.innerHTML = ''; appData.categories['Income'].forEach(sub => { incList.innerHTML += `<option value="${sub}"></option>`; }); } const expList = document.getElementById('expenseSubList'); if (expList) { expList.innerHTML = ''; Object.keys(appData.categories).forEach(parent => { if (parent !== 'Income') { (appData.categories[parent] || []).forEach(sub => { expList.innerHTML += `<option value="${sub}">${parent}</option>`; }); } }); } }
+        function handleSchSubInput(i) {
+            const v = (i ? i.value : (document.getElementById('schSub') ? document.getElementById('schSub').value : '')).trim();
+            const p = document.getElementById('schParent');
+            const typeEl = document.getElementById('schType');
+            const t = (typeEl && typeEl.value) || 'Expense';
+            let f = "";
+
+            if (t === 'Income') {
+                f = "Income";
+            } else {
+                for (const [k, vals] of Object.entries(appData.categories || {})) {
+                    if (k === 'Income') continue;
+                    if (Array.isArray(vals) && vals.map(String).includes(v)) {
+                        f = k;
+                        break;
+                    }
+                }
+            }
+            if (p) p.value = f;
+        }
+        function refreshTransferDropdowns() { const mode = document.getElementById('inpMode').value; const filter = mode === 'Cash' ? 'Cash' : 'Cashless';['inpTransferSource', 'bulkGlobalSource', 'pendIncAccount'].forEach(id => { const el = document.getElementById(id); if (!el) return; const existingVal = el.value; let defaultText = id === 'bulkGlobalSource' ? "Select Source..." : "Select Account..."; el.innerHTML = `<option value="" disabled selected>${defaultText}</option>`; if (appData && appData.sources) { appData.sources.forEach(s => { const n = Array.isArray(s) ? s[0] : s; const type = Array.isArray(s) ? (s[1] || 'Bank') : 'Bank'; if (filter === 'Cash') { if (type === 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`; } else { if (type !== 'Cash') el.innerHTML += `<option value="${n}">${n}</option>`; } }); } if (existingVal && Array.from(el.options).some(o => o.value === existingVal)) el.value = existingVal; else el.value = ''; }); refreshScheduleSources(); }
+        function populateFilterDropdowns() { const p = document.getElementById('filterParent'), s = document.getElementById('filterSub'), src = document.getElementById('filterSource'), m = document.getElementById('modalParentList'), b = document.getElementById('budgetCat'), bulkP = document.getElementById('bulkParent'); if (!appData || !appData.categories) return; if (p) { p.innerHTML = '<option value="">All Parents</option>'; Object.keys(appData.categories).sort().forEach(k => p.innerHTML += `<option value="${k}">${k}</option>`); } if (s) { updateSubFilter(); } if (src) { src.innerHTML = '<option value="">All Sources</option>'; (appData.sources || []).forEach(r => { let n = Array.isArray(r) ? r[0] : r; src.innerHTML += `<option value="${n}">${n}</option>`; }); } if (m) { m.innerHTML = ''; Object.keys(appData.categories).sort().forEach(k => m.innerHTML += `<option value="${k}">`); } if (b) { b.innerHTML = '<option value="">Select Category</option>'; Object.keys(appData.categories).sort().forEach(function (par) { if (par === 'Income') return; b.innerHTML += `<option value="${par}">${par} (parent)</option>`; (appData.categories[par] || []).forEach(function (sub) { b.innerHTML += `<option value="${par}|${sub}">${par} › ${sub}</option>`; }); }); } if (bulkP) { bulkP.innerHTML = '<option value="" disabled selected>Select Parent...</option>'; Object.keys(appData.categories).sort().forEach(k => bulkP.innerHTML += `<option value="${k}">${k}</option>`); } const incList = document.getElementById('incomeSubList'); if (incList && appData.categories['Income']) { incList.innerHTML = ''; appData.categories['Income'].forEach(sub => { incList.innerHTML += `<option value="${sub}"></option>`; }); } const expList = document.getElementById('expenseSubList'); if (expList) { expList.innerHTML = ''; Object.keys(appData.categories).forEach(parent => { if (parent !== 'Income') { (appData.categories[parent] || []).forEach(sub => { expList.innerHTML += `<option value="${sub}">${parent}</option>`; }); } }); } refreshScheduleDatalist(); }
         function updateSubFilter() { const p = document.getElementById('filterParent').value; const s = document.getElementById('filterSub'); if (!s) return; s.innerHTML = '<option value="">All Sub-Cats</option>'; let list = []; if (p && appData.categories[p]) { list = appData.categories[p]; } else { const set = new Set(); Object.values(appData.categories).flat().forEach(x => set.add(x)); list = Array.from(set).sort(); } list.forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`); }
         function populateRemarksDatalist() { const dl = document.getElementById('remarksList'); if (!dl) return; const u = new Set(); for (let i = appData.expenses.length - 1; i >= 0; i--) { if (appData.expenses[i][appData.schema.remarks]) u.add(appData.expenses[i][appData.schema.remarks]); } dl.innerHTML = ''; u.forEach(r => { const o = document.createElement('option'); o.value = r; dl.appendChild(o); }); }
-        function refreshAllDatalists() { const t = document.getElementById('inpType').value, dl = document.getElementById('subCatList'); dl.innerHTML = ''; const added = new Set(); for (const [p, subs] of Object.entries(appData.categories)) { if ((t === 'Income' && p !== 'Income') || (t !== 'Income' && p === 'Income')) continue; subs.forEach(s => { const o = document.createElement('option'); o.value = s; dl.appendChild(o); added.add(s); }); } if (appData.scheduled) { appData.scheduled.forEach(r => { const schType = r[4] || 'Expense'; if ((t === 'Income' && schType !== 'Income') || (t !== 'Income' && schType === 'Income')) return; const s = r[5] || ''; if (s && !added.has(s)) { const o = document.createElement('option'); o.value = s; dl.appendChild(o); added.add(s); } }); } handleModeChange(); }
+        function refreshAllDatalists() { const t = document.getElementById('inpType').value, dl = document.getElementById('subCatList'); dl.innerHTML = ''; const added = new Set(); for (const [p, subs] of Object.entries(appData.categories)) { if ((t === 'Income' && p !== 'Income') || (t !== 'Income' && p === 'Income')) continue; subs.forEach(s => { const o = document.createElement('option'); o.value = s; dl.appendChild(o); added.add(s); }); } if (appData.scheduled) { appData.scheduled.forEach(r => { const schType = r[4] || 'Expense'; if ((t === 'Income' && schType !== 'Income') || (t !== 'Income' && schType === 'Income')) return; const s = r[5] || ''; if (s && !added.has(s)) { const o = document.createElement('option'); o.value = s; dl.appendChild(o); added.add(s); } }); } handleModeChange(); refreshScheduleDatalist(); }
         function renderSettingsUI() {
             const s = document.getElementById('settingsSourceList'), p = document.getElementById('settingsParentList'), sub = document.getElementById('settingsSubList'); if (!s || !p || !sub) return; const qf = getQuickFilters(); const esc = (str) => str.replace(/'/g, "\\'"); s.innerHTML = (appData.sources || []).map((r, i, arr) => {
                 const n = Array.isArray(r) ? r[0] : r, type = Array.isArray(r) ? (r[1] || 'Bank') : 'Bank'; const openVal = Array.isArray(r) ? (Number(r[2]) || 0) : 0; const f = Array.isArray(r) ? r[6] : false, def = Array.isArray(r) ? r[7] : false;
@@ -5091,18 +5351,133 @@
                 lastDeletedTxn = null;
             }
         }
-        function editSch(id) { const r = appData.scheduled.find(x => x[0] === id); if (!r) return; document.getElementById('schId').value = r[0]; document.getElementById('schFreq').value = r[1]; document.getElementById('schStartDate').value = r[2]; document.getElementById('schEndDate').value = r[3]; document.getElementById('schType').value = r[4]; document.getElementById('schSub').value = r[5]; document.getElementById('schParent').value = r[6]; document.getElementById('schAmount').value = r[7]; document.getElementById('schMode').value = r[8]; document.getElementById('schSource').value = r[9]; document.getElementById('schRemarks').value = r[10]; document.getElementById('schFormTitle').innerText = "Edit Schedule"; const btn = document.getElementById('btnSchSubmit'); btn.innerHTML = 'Update Schedule'; }
-        function resetScheduleForm() { document.getElementById('scheduleForm').reset(); document.getElementById('schId').value = ''; const today = new Date().toISOString().split('T')[0]; document.getElementById('schStartDate').value = today; document.getElementById('schFreq').value = 'Monthly'; document.getElementById('schType').value = 'Expense'; document.getElementById('schFormTitle').innerText = "Create Schedule"; const btn = document.getElementById('btnSchSubmit'); btn.innerHTML = 'Set Schedule'; }
+        function handleSchFirstDateChange(val) {
+            const nextDue = document.getElementById('schStartDate');
+            const schId = document.getElementById('schId') ? document.getElementById('schId').value : '';
+            if (nextDue && (!nextDue.value || !schId)) {
+                nextDue.value = val;
+            }
+        }
+        function selectScheduleRow(id) {
+            document.querySelectorAll('#scheduledTableBody tr').forEach(r => {
+                r.classList.remove('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            });
+            const row = document.getElementById(`schedule-row-${id}`);
+            if (row) {
+                row.classList.add('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            }
+            editSch(id);
+        }
+        function editSch(id) {
+            const r = appData.scheduled.find(x => x[0] === id);
+            if (!r) return;
+            document.getElementById('schId').value = r[0] || '';
+            document.getElementById('schFreq').value = r[1] || 'Monthly';
+            document.getElementById('schFirstDate').value = r[11] || r[2] || '';
+            document.getElementById('schStartDate').value = r[2] || '';
+            document.getElementById('schEndDate').value = r[3] || '';
+            document.getElementById('schType').value = r[4] || 'Expense';
+            refreshScheduleDatalist();
+            document.getElementById('schSub').value = r[5] || '';
+            document.getElementById('schParent').value = r[6] || '';
+            handleSchSubInput(document.getElementById('schSub'));
+            document.getElementById('schAmount').value = r[7] || '';
+            document.getElementById('schMode').value = r[8] || 'Cashless';
+            refreshScheduleSources();
+            document.getElementById('schSource').value = r[9] || '';
+            document.getElementById('schRemarks').value = r[10] || '';
+            document.getElementById('schFormTitle').innerText = "Edit Schedule";
+            const btn = document.getElementById('btnSchSubmit');
+            if (btn) btn.innerHTML = 'Update Schedule';
+        }
+        function resetScheduleForm() {
+            document.querySelectorAll('#scheduledTableBody tr').forEach(r => {
+                r.classList.remove('bg-emerald-100/70', 'dark:bg-emerald-950/50', 'ring-1', 'ring-emerald-400/50');
+            });
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('schId').value = '';
+            const now = new Date();
+            const today = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            document.getElementById('schFirstDate').value = today;
+            document.getElementById('schStartDate').value = today;
+            document.getElementById('schEndDate').value = '';
+            document.getElementById('schFreq').value = 'Monthly';
+            document.getElementById('schType').value = 'Expense';
+            document.getElementById('schMode').value = 'Cashless';
+            document.getElementById('schParent').value = '';
+            refreshScheduleDatalist();
+            refreshScheduleSources();
+            document.getElementById('schFormTitle').innerText = "Create Schedule";
+            const btn = document.getElementById('btnSchSubmit');
+            if (btn) btn.innerHTML = 'Set Schedule';
+        }
         function handleScheduleSubmit(e) {
             e.preventDefault();
-            var f = document.getElementById('scheduleForm'), p = { scheduleId: f.scheduleId.value, frequency: f.frequency.value, startDate: f.startDate.value, endDate: f.endDate.value, type: f.type.value, subCategory: f.subCategory.value, parentCategory: f.parentCategory.value, amount: f.amount.value, mode: f.mode.value, source: f.source.value, remarks: f.remarks.value };
+            var f = document.getElementById('scheduleForm');
+            var subVal = (f.subCategory.value || '').trim();
+            var typeVal = f.type.value || 'Expense';
+            var parentVal = f.parentCategory.value;
+
+            if (!parentVal) {
+                if (typeVal === 'Income') {
+                    parentVal = 'Income';
+                } else {
+                    for (const [k, vals] of Object.entries(appData.categories || {})) {
+                        if (k !== 'Income' && Array.isArray(vals) && vals.map(String).includes(subVal)) {
+                            parentVal = k;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!parentVal) {
+                parentVal = typeVal === 'Income' ? 'Income' : 'Expense';
+            }
+
+            var firstStartVal = f.firstStartDate ? f.firstStartDate.value : f.startDate.value;
+            if (!firstStartVal) firstStartVal = f.startDate.value;
+
+            var p = {
+                scheduleId: f.scheduleId.value,
+                frequency: f.frequency.value,
+                firstStartDate: firstStartVal,
+                startDate: f.startDate.value,
+                endDate: f.endDate.value,
+                type: typeVal,
+                subCategory: subVal,
+                parentCategory: parentVal,
+                amount: f.amount.value,
+                mode: f.mode.value,
+                source: f.source.value,
+                remarks: f.remarks.value
+            };
+
             var btn = document.getElementById('btnSchSubmit');
             btn.innerText = "Saving...";
             btn.disabled = true;
-            function done() { showToast(p.scheduleId ? "Schedule Updated!" : "Schedule Created!"); updateLastSyncedIndicator(); resetScheduleForm(); btn.disabled = false; if (useSupabase()) fetchInitialDataFromSupabase().then(function (data) { onDataLoad(JSON.stringify(data)); }); else google.script.run.withSuccessHandler(onDataLoad).getInitialData(); }
-            function fail(err) { showToast(err && err.message ? err.message : 'Failed', 'error'); btn.disabled = false; }
-            if (useSupabase()) { saveScheduleToSupabase(p).then(done).catch(fail); }
-            else { google.script.run.withSuccessHandler(done).saveSchedule(p); }
+
+            function done() {
+                showToast(p.scheduleId ? "Schedule Updated!" : "Schedule Created!");
+                updateLastSyncedIndicator();
+                resetScheduleForm();
+                btn.disabled = false;
+                if (useSupabase()) {
+                    fetchInitialDataFromSupabase().then(function (data) { onDataLoad(JSON.stringify(data)); });
+                } else {
+                    google.script.run.withSuccessHandler(onDataLoad).getInitialData();
+                }
+            }
+            function fail(err) {
+                showToast(err && err.message ? err.message : 'Failed', 'error');
+                btn.disabled = false;
+                btn.innerText = p.scheduleId ? "Update Schedule" : "Set Schedule";
+            }
+
+            if (useSupabase()) {
+                saveScheduleToSupabase(p).then(done).catch(fail);
+            } else {
+                google.script.run.withSuccessHandler(done).withFailureHandler(fail).saveSchedule(p);
+            }
         }
 
         // --- NEW SHARED STATS FUNCTION ---
@@ -5139,6 +5514,13 @@
                 const nextDueStr = r[2];
                 const sunsetStr = r[3];
                 const sourceAcc = r[9] || 'Unspecified';
+                const firstStartStr = r[11] || r[2];
+
+                // Skip if not started before end of this month
+                if (firstStartStr) {
+                    const firstDate = new Date(firstStartStr);
+                    if (firstDate > endOfM) return;
+                }
 
                 // Skip if expired before this month starts
                 if (sunsetStr) {
@@ -5162,11 +5544,19 @@
                     let isDone = false;
 
                     if (freq === 'Monthly') {
-                        // STRICT MODE: Check for actual log in this specific month
-                        const match = monthLogs.find(log =>
-                            log[s.sub] === sub &&
-                            Math.abs(Number(log[s.amt]) - amt) < 1
-                        );
+                        // Match by explicit Schedule ID/tag first, or by category/amount if transaction date >= firstStartDate
+                        const match = monthLogs.find(log => {
+                            const logId = String(log[s.id] || '');
+                            const logRem = String(log[s.remarks] || '');
+                            if (logId.includes(r[0]) || logRem.includes('[Schedule: ' + r[0] + ']') || logRem.includes('[SCH-' + r[0] + ']')) {
+                                return true;
+                            }
+                            const logDate = new Date(log[s.date]);
+                            logDate.setHours(0, 0, 0, 0);
+                            const firstStartDate = new Date(firstStartStr);
+                            firstStartDate.setHours(0, 0, 0, 0);
+                            return logDate >= firstStartDate && log[s.sub] === sub && Math.abs(Number(log[s.amt]) - amt) < 1;
+                        });
                         isDone = !!match;
                     } else {
                         // FALLBACK (Weekly/Daily): Check Next Due Date vs Month End
@@ -5287,6 +5677,7 @@
                 const parentCat = r[6]; // Assuming parent is at 6 based on your previous code
                 const amt = Number(r[7]) || 0;
                 const sourceAcc = r[9] || 'Unspecified';
+                const firstStartStr = r[11] || r[2];
 
                 // Skip Inactive/Expired
                 if (sunsetStr) {
@@ -5297,14 +5688,23 @@
                 // --- SMART MATCH LOGIC (For Badge) ---
                 let isDone = false;
                 let doneDate = "";
+                const firstStartDate = new Date(firstStartStr);
+                firstStartDate.setHours(0, 0, 0, 0);
+                const isUpcoming = firstStartDate > endOfMonth;
 
-                if (['Monthly', 'Weekly', 'Daily'].includes(freq)) {
+                if (!isUpcoming && ['Monthly', 'Weekly', 'Daily'].includes(freq)) {
                     if (freq === 'Monthly') {
-                        // STRICT MATCH: Look for log in this month
-                        const match = monthLogs.find(log =>
-                            log[s.sub] === subCat &&
-                            Math.abs(Number(log[s.amt]) - amt) < 1
-                        );
+                        // Match explicit schedule ID link or verified transaction on/after start date
+                        const match = monthLogs.find(log => {
+                            const logId = String(log[s.id] || '');
+                            const logRem = String(log[s.remarks] || '');
+                            if (logId.includes(id) || logRem.includes('[Schedule: ' + id + ']') || logRem.includes('[SCH-' + id + ']')) {
+                                return true;
+                            }
+                            const logDate = new Date(log[s.date]);
+                            logDate.setHours(0, 0, 0, 0);
+                            return logDate >= firstStartDate && log[s.sub] === subCat && Math.abs(Number(log[s.amt]) - amt) < 1;
+                        });
 
                         if (match) {
                             isDone = true;
@@ -5324,12 +5724,14 @@
                 // Date Styling (Orange if due soon and NOT done)
                 const dNext = new Date(r[2]);
                 const isSoon = dNext <= new Date(realToday.getTime() + 7 * 86400000);
-                const dateColor = (isSoon && !isDone) ? "text-orange-600 font-bold" : "text-blue-600 font-medium";
+                const dateColor = (isSoon && !isDone && !isUpcoming) ? "text-orange-600 font-bold" : "text-blue-600 font-medium";
 
-                // Frequency Badge with "DONE" Status
+                // Frequency Badge with "DONE" / "UPCOMING" Status
                 let freqHtml = `<span class="font-bold text-gray-700 dark:text-gray-300">${freq}</span>`;
                 if (isDone) {
                     freqHtml += ` <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800" title="Verified in log: ${doneDate}">DONE</span>`;
+                } else if (isUpcoming) {
+                    freqHtml += ` <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800" title="Starts on ${firstStartStr}">STARTS ${firstStartStr}</span>`;
                 }
 
                 // Row Highlight (Subtle green tint if done)
@@ -5346,8 +5748,9 @@
                 */
 
                 tb.innerHTML += `
-        <tr data-source="${sourceAcc}" class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition ${rowBg}${staggerClass}">
+        <tr id="schedule-row-${id}" onclick="selectScheduleRow('${id}')" data-source="${sourceAcc}" class="border-b dark:border-gray-700 hover:bg-emerald-50/50 dark:hover:bg-white/[0.04] transition cursor-pointer group ${rowBg}${staggerClass}">
             <td class="p-3 whitespace-nowrap">${freqHtml}</td>
+            <td class="p-3 text-xs text-gray-600 dark:text-gray-400 font-mono">${firstStartStr}</td>
             <td class="p-3 ${dateColor}">${nextDueStr}</td>
             <td class="p-3 text-xs">
                 <div class="font-bold text-gray-800 dark:text-gray-200">${subCat}</div>
@@ -5355,11 +5758,10 @@
             </td>
             <td class="p-3 font-mono font-bold">₹${amt.toLocaleString('en-IN')}</td>
             <td class="p-3 text-xs text-gray-500">${dEnd}</td>
-            <td class="p-3 flex flex-wrap gap-1 justify-center">
+            <td class="p-3 flex flex-wrap gap-1 justify-center" onclick="event.stopPropagation()">
                 <button onclick="skipScheduleOccurrence('${id}')" class="text-amber-600 hover:text-amber-800 p-1 bg-amber-50 dark:bg-amber-900/30 rounded" title="Skip this occurrence"><i data-feather="skip-forward" class="w-4 h-4"></i></button>
                 <button onclick="openCreateOnceFromSchedule('${id}')" class="text-green-600 hover:text-green-800 p-1 bg-green-50 dark:bg-green-900/30 rounded" title="Create one-off for date"><i data-feather="calendar" class="w-4 h-4"></i></button>
-                <button onclick="editSch('${id}')" class="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 dark:bg-blue-900/30 rounded"><i data-feather="edit-2" class="w-4 h-4"></i></button>
-                <button onclick="delSch('${id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                <button onclick="delSch('${id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 rounded" title="Delete Schedule"><i data-feather="trash-2" class="w-4 h-4"></i></button>
             </td>
         </tr>`;
             });
@@ -5373,6 +5775,9 @@
         function delSch(id) {
             openConfirmModal("Stop and delete this recurring schedule?", function () {
                 appData.scheduled = appData.scheduled.filter(function (r) { return r[0] !== id; });
+                if (document.getElementById('schId') && document.getElementById('schId').value === id) {
+                    resetScheduleForm();
+                }
                 renderScheduledTable();
                 if (useSupabase()) deleteScheduleToSupabase(id).then(updateLastSyncedIndicator).catch(function (e) { showToast(e && e.message ? e.message : 'Failed', 'error'); });
                 else google.script.run.withSuccessHandler(function () { }).deleteSchedule(id);
@@ -5407,7 +5812,8 @@
             var dateStr = document.getElementById('createOnceDate').value;
             if (!dateStr) return showToast("Select a date", 'error');
             var r = currentCreateOnceSchedule;
-            var payload = { date: dateStr, type: r[4] || 'Expense', subCategory: r[5] || '', parentCategory: r[6] || '', amount: Number(r[7]) || 0, mode: r[8] || 'Cashless', source: r[9] || '', remarks: (r[10] || '') + ' (from schedule)' };
+            var txnId = 'TXN-SCH-' + r[0] + '-' + dateStr;
+            var payload = { transactionId: txnId, date: dateStr, type: r[4] || 'Expense', subCategory: r[5] || '', parentCategory: r[6] || '', amount: Number(r[7]) || 0, mode: r[8] || 'Cashless', source: r[9] || '', remarks: (r[10] || '') + ' (from schedule) [Schedule: ' + r[0] + ']' };
             if (useSupabase()) {
                 saveTransactionToSupabase(payload).then(function () {
                     closeCreateOnceModal();
@@ -5416,7 +5822,7 @@
                 }).catch(function (e) { showToast(e && e.message ? e.message : 'Failed', 'error'); });
             } else {
                 var s = appData.schema;
-                appData.expenses.push([('TXN-' + Date.now()), dateStr, r[4] || 'Expense', r[5] || '', r[6] || '', Number(r[7]) || 0, r[8] || 'Cashless', r[9] || '', (r[10] || '') + ' (from schedule)']);
+                appData.expenses.push([txnId, dateStr, r[4] || 'Expense', r[5] || '', r[6] || '', Number(r[7]) || 0, r[8] || 'Cashless', r[9] || '', (r[10] || '') + ' (from schedule) [Schedule: ' + r[0] + ']']);
                 appData.expenses.sort(function (a, b) { return b[s.date].localeCompare(a[s.date]); });
                 buildSearchIndex(); calculateLiveBalances();
                 closeCreateOnceModal();
@@ -5461,6 +5867,10 @@
 
                 for (let i = 0; i < schedules.length; i++) {
                     let r = schedules[i];
+                    let firstStartStr = r[11] || r[2];
+                    let firstStart = firstStartStr ? new Date(firstStartStr) : null;
+                    if (firstStart) firstStart.setHours(0, 0, 0, 0);
+
                     let nextDueStr = r[2];
                     let n = new Date(nextDueStr);
                     n.setHours(0, 0, 0, 0);
@@ -5468,12 +5878,15 @@
                     let end = r[3] ? new Date(r[3]) : null;
                     if (end) end.setHours(0, 0, 0, 0);
 
+                    if (firstStart && today < firstStart) continue; // Not started yet!
                     if (end && today > end) continue; // Expired
 
                     if (today >= n) {
                         // Time to run!
                         let txnDate = nextDueStr; // n formatted as YYYY-MM-DD
+                        let txnId = 'TXN-SCH-' + r[0] + '-' + txnDate;
                         let payload = {
+                            transactionId: txnId,
                             date: txnDate,
                             type: r[4] || 'Expense',
                             subCategory: r[5] || '',
@@ -5481,7 +5894,7 @@
                             amount: Number(r[7]) || 0,
                             mode: r[8] || 'Cashless',
                             source: r[9] || '',
-                            remarks: (r[10] || '') + ' (Auto)'
+                            remarks: (r[10] || '') + ' (Auto) [Schedule: ' + r[0] + ']'
                         };
 
                         // Save Transaction
@@ -5501,6 +5914,7 @@
                         let schedulePayload = {
                             scheduleId: r[0],
                             frequency: r[1],
+                            firstStartDate: r[11] || r[2],
                             startDate: r[2],
                             endDate: r[3],
                             type: r[4],
@@ -7566,7 +7980,12 @@
                 const sub = r[5];
                 const amt = Number(r[7]);
                 const sunset = r[3] ? new Date(r[3]) : null;
+                const firstStartStr = r[11] || r[2];
+                const firstStart = firstStartStr ? new Date(firstStartStr) : null;
+                if (firstStart) firstStart.setHours(0, 0, 0, 0);
 
+                if (firstStart && targetDate < firstStart) return;
+                if (sunset && targetDate > sunset) return;
                 if (sunset && sunset < startOfM) return;
 
                 let matchDay = false;
@@ -7578,7 +7997,16 @@
                     // Check Done Status
                     let isDone = false;
                     if (freq === 'Monthly') {
-                        const log = monthLogs.find(l => l[s.sub] === sub && Math.abs(Number(l[s.amt]) - amt) < 1);
+                        const log = monthLogs.find(l => {
+                            const logId = String(l[s.id] || '');
+                            const logRem = String(l[s.remarks] || '');
+                            if (logId.includes(r[0]) || logRem.includes('[Schedule: ' + r[0] + ']') || logRem.includes('[SCH-' + r[0] + ']')) {
+                                return true;
+                            }
+                            const logDate = new Date(l[s.date]);
+                            logDate.setHours(0, 0, 0, 0);
+                            return (!firstStart || logDate >= firstStart) && l[s.sub] === sub && Math.abs(Number(l[s.amt]) - amt) < 1;
+                        });
                         isDone = !!log;
                     } else {
                         const sysNextDue = new Date(r[2]); sysNextDue.setHours(0, 0, 0, 0);
@@ -7664,21 +8092,39 @@
                 const sub = r[5];
                 const amt = Number(r[7]);
                 const sunset = r[3] ? new Date(r[3]) : null;
+                const firstStartStr = r[11] || r[2];
+                const firstStart = firstStartStr ? new Date(firstStartStr) : null;
+                if (firstStart) firstStart.setHours(0, 0, 0, 0);
 
+                if (firstStart && firstStart > endOfM) return;
                 if (sunset && sunset < startOfM) return;
 
                 let days = [];
                 if (freq === 'Monthly') {
                     const dueDay = nextDue.getDate();
-                    if (dueDay <= daysInMonth) days.push(dueDay);
+                    if (dueDay <= daysInMonth) {
+                        const testDate = new Date(year, month, dueDay);
+                        testDate.setHours(0, 0, 0, 0);
+                        if ((!firstStart || testDate >= firstStart) && (!sunset || testDate <= sunset)) {
+                            days.push(dueDay);
+                        }
+                    }
                 } else if (freq === 'Weekly') {
                     const targetDay = nextDue.getDay();
                     for (let d = 1; d <= daysInMonth; d++) {
-                        if (new Date(year, month, d).getDay() === targetDay) days.push(d);
+                        const testDate = new Date(year, month, d);
+                        testDate.setHours(0, 0, 0, 0);
+                        if (testDate.getDay() === targetDay && (!firstStart || testDate >= firstStart) && (!sunset || testDate <= sunset)) {
+                            days.push(d);
+                        }
                     }
                 } else if (freq === 'One-Time') {
                     if (nextDue.getMonth() === month && nextDue.getFullYear() === year) {
-                        days.push(nextDue.getDate());
+                        const testDate = new Date(year, month, nextDue.getDate());
+                        testDate.setHours(0, 0, 0, 0);
+                        if ((!firstStart || testDate >= firstStart) && (!sunset || testDate <= sunset)) {
+                            days.push(nextDue.getDate());
+                        }
                     }
                 }
 
@@ -7689,9 +8135,16 @@
                     let logMatch = null;
 
                     if (freq === 'Monthly') {
-                        logMatch = monthLogs.find(log =>
-                            log[s.sub] === sub && Math.abs(Number(log[s.amt]) - amt) < 1
-                        );
+                        logMatch = monthLogs.find(log => {
+                            const logId = String(log[s.id] || '');
+                            const logRem = String(log[s.remarks] || '');
+                            if (logId.includes(r[0]) || logRem.includes('[Schedule: ' + r[0] + ']') || logRem.includes('[SCH-' + r[0] + ']')) {
+                                return true;
+                            }
+                            const logDate = new Date(log[s.date]);
+                            logDate.setHours(0, 0, 0, 0);
+                            return (!firstStart || logDate >= firstStart) && log[s.sub] === sub && Math.abs(Number(log[s.amt]) - amt) < 1;
+                        });
                         isDone = !!logMatch;
                     } else {
                         const specificDate = new Date(year, month, d); specificDate.setHours(0, 0, 0, 0);
@@ -8017,14 +8470,14 @@
             }
 
             // Remove any items from plan.allocations that are now fixed in schedule to avoid duplicates
-            const fixedCatNames = scheduledItems.map(a => a.category);
-            plan.allocations = plan.allocations.filter(a => !fixedCatNames.includes(a.category));
+            const fixedCatNames = scheduledItems.map(a => (a.category || '').toLowerCase().trim());
+            plan.allocations = (plan.allocations || []).filter(a => !fixedCatNames.includes((a.category || '').toLowerCase().trim()));
 
             // Inject defaults if they are not already in allocations
             const defaults = JSON.parse(localStorage.getItem('defaultBudgetCategories') || '[]');
-            const existingCats = plan.allocations.map(a => a.category).concat(fixedCatNames);
+            const existingCats = plan.allocations.map(a => (a.category || '').toLowerCase().trim()).concat(fixedCatNames);
             defaults.forEach(defCat => {
-                if (!existingCats.includes(defCat)) {
+                if (!existingCats.includes((defCat || '').toLowerCase().trim())) {
                     plan.allocations.push({ category: defCat, amount: '' });
                 }
             });
@@ -8040,10 +8493,30 @@
         }
 
         function calculateMonthlyFixed(monthStr) {
-            // Simplified: Sum of all active Monthly/Weekly schedules
             let total = 0;
             let breakdown = [];
+            if (!monthStr) {
+                const now = new Date();
+                monthStr = now.toISOString().slice(0, 7);
+            }
+            const parts = monthStr.split('-').map(Number);
+            const y = parts[0];
+            const m = parts[1];
+            const startOfM = new Date(y, m - 1, 1);
+            const endOfM = new Date(y, m, 0);
+
             appData.scheduled.forEach(r => {
+                const firstStartStr = r[11] || r[2];
+                const sunsetStr = r[3];
+                if (firstStartStr) {
+                    const firstDate = new Date(firstStartStr);
+                    if (firstDate > endOfM) return; // Has not started in this month!
+                }
+                if (sunsetStr) {
+                    const sunDate = new Date(sunsetStr);
+                    if (sunDate < startOfM) return; // Expired before this month!
+                }
+
                 const type = r[4];
                 if (type === 'Expense' || type === 'Transfer') {
                     const freq = r[1];
@@ -8057,7 +8530,7 @@
 
                     if (amt > 0) {
                         total += amt;
-                        let existing = breakdown.find(x => x.category === cat);
+                        let existing = breakdown.find(x => (x.category || '').toLowerCase().trim() === (cat || '').toLowerCase().trim());
                         if (existing) existing.amount += amt;
                         else breakdown.push({ category: cat, amount: amt, isFixed: true });
                     }
@@ -8428,7 +8901,9 @@
                 }, 0);
 
                 const fixedData = calculateMonthlyFixed(monthStr);
-                const allAllocations = fixedData.breakdown.concat(plan.allocations);
+                const fixedCatNames = fixedData.breakdown.map(f => (f.category || '').toLowerCase().trim());
+                const filteredPlanAllocations = (plan.allocations || []).filter(a => !fixedCatNames.includes((a.category || '').toLowerCase().trim()));
+                const allAllocations = fixedData.breakdown.concat(filteredPlanAllocations);
 
                 let expenseHtml = '';
                 let savingsHtml = '';
@@ -8745,7 +9220,9 @@
                 let monthCategory = 0;
 
                 const fixedData = calculateMonthlyFixed(monthStr);
-                const allAllocations = fixedData.breakdown.concat(pd.allocations || []);
+                const fixedCatNames = fixedData.breakdown.map(f => (f.category || '').toLowerCase().trim());
+                const filteredPlanAllocations = (pd.allocations || []).filter(a => !fixedCatNames.includes((a.category || '').toLowerCase().trim()));
+                const allAllocations = fixedData.breakdown.concat(filteredPlanAllocations);
 
                 allAllocations.forEach(a => {
                     const bucketName = a.category.toLowerCase().trim();

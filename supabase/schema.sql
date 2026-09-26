@@ -65,14 +65,15 @@ CREATE INDEX IF NOT EXISTS idx_sources_user ON public.sources(user_id);
 
 -- ========================================
 -- 4. RECURRING / SCHEDULED (replaces Sheet "Recurring")
--- ID, Freq, Date, End, Type, Sub, Parent, Amt, Mode, Src, Rem
+-- ID, Freq, Next Due Date (start_date), End, Type, Sub, Parent, Amt, Mode, Src, Rem
+-- Note: remarks stores optional [Start: YYYY-MM-DD] for the initial start date of the series
 -- ========================================
 CREATE TABLE IF NOT EXISTS public.recurring (
   id TEXT PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  frequency TEXT NOT NULL,     -- Daily, Weekly, Monthly, etc.
-  start_date DATE NOT NULL,
-  end_date DATE,
+  frequency TEXT NOT NULL,     -- Daily, Weekly, Monthly, Annually
+  start_date DATE NOT NULL,    -- Next due execution date
+  end_date DATE,               -- Sunset / expiration date
   type TEXT NOT NULL,
   sub TEXT,
   parent TEXT,

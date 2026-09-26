@@ -100,6 +100,15 @@ function getInitialData() {
       response.scheduled = rawRec.filter(r => r[0] !== "").map(r => {
         if (r[2] && r[2] instanceof Date) r[2] = Utilities.formatDate(r[2], tz, 'yyyy-MM-dd');
         if (r[3] && r[3] instanceof Date) r[3] = Utilities.formatDate(r[3], tz, 'yyyy-MM-dd');
+        var rem = String(r[10] || '');
+        var firstStart = r[2];
+        var startMatch = rem.match(/\[Start:\s*(\d{4}-\d{2}-\d{2})\]/i);
+        if (startMatch && startMatch[1]) {
+          firstStart = startMatch[1];
+          rem = rem.replace(/\[Start:\s*(\d{4}-\d{2}-\d{2})\]/i, '').trim();
+          r[10] = rem;
+        }
+        r[11] = firstStart;
         return r;
       });
     }
@@ -401,7 +410,11 @@ function saveSchedule(f) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const rs = ss.getSheetByName('Recurring');
     const id = f.scheduleId || "SCH-" + new Date().getTime();
-    const row = [id, f.frequency, f.startDate, f.endDate, f.type, f.subCategory, f.parentCategory, f.amount, f.mode, f.source, f.remarks];
+    var rem = f.remarks || '';
+    if (f.firstStartDate) {
+      rem = (rem ? rem + ' ' : '') + '[Start: ' + f.firstStartDate + ']';
+    }
+    const row = [id, f.frequency, f.startDate, f.endDate, f.type, f.subCategory, f.parentCategory, f.amount, f.mode, f.source, rem];
     if (f.scheduleId) {
       const fin = rs.createTextFinder(id).matchEntireCell(true);
       const r = fin.findNext();
@@ -608,10 +621,18 @@ function processRecurringTransactions() {
     const data = rng.getValues();
     const today = new Date(); today.setHours(0, 0, 0, 0);
     data.forEach((r, i) => {
+      var rem = String(r[10] || '');
+      var firstStart = r[2];
+      var startMatch = rem.match(/\[Start:\s*(\d{4}-\d{2}-\d{2})\]/i);
+      if (startMatch && startMatch[1]) {
+        firstStart = startMatch[1];
+      }
+      let fsd = new Date(firstStart); fsd.setHours(0, 0, 0, 0);
       let n = new Date(r[2]); n.setHours(0, 0, 0, 0);
       const end = r[3] ? new Date(r[3]) : null;
       if (end) end.setHours(0, 0, 0, 0);
-      if (end && today > end) return;
+      if (today < fsd) return; // Not started yet!
+      if (end && today > end) return; // Expired
       if (today >= n) {
         const tid = "TXN-AUTO-" + today.getTime() + "-" + i;
         // FIX: Use the Scheduled Date (n) instead of Today for the log, so it's accurate even if script runs late
