@@ -7,3 +7,8 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+
+# Node and build outputs
+node_modules/
+www/
+

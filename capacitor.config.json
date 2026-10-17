@@ -1,0 +1,12 @@
+{
+  "appId": "com.omnish.myexptrack",
+  "appName": "Expense Track",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

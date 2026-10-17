@@ -1,0 +1,26 @@
+{
+  "name": "myexptrack",
+  "version": "1.0.0",
+  "description": "Expense Command Center - Personal Finance and Expense Tracking Application",
+  "main": "ExpTracker.html",
+  "scripts": {
+    "build": "node build.js",
+    "cap:sync": "npm run build && cap sync android",
+    "cap:copy": "npm run build && cap copy android"
+  },
+  "keywords": [
+    "expense-tracker",
+    "finance",
+    "capacitor",
+    "android"
+  ],
+  "author": "Omnish",
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  }
+}
