@@ -2924,13 +2924,7 @@
             var src = (d.splits && d.splits.length > 0) ? d.splits.map(function (s) { return s.source + ': ' + s.amount; }).join(' | ') : (d.source || '');
             var id = d.transactionId || ('TXN-' + new Date().getTime());
             var row = { id: id, user_id: supabaseUserId, date: d.date, type: d.type, sub: d.subCategory || '', parent: d.parentCategory || '', amount: Number(d.amount), mode: d.mode || 'Cashless', source: src, remarks: d.remarks || '' };
-            if (d.transactionId) {
-                return supabase.from('expenses').update({ date: row.date, type: row.type, sub: row.sub, parent: row.parent, amount: row.amount, mode: row.mode, source: row.source, remarks: row.remarks }).eq('user_id', supabaseUserId).eq('id', id).then(function (res) {
-                    if (res.error) return Promise.reject(new Error(res.error.message));
-                    return { success: true, savedId: id };
-                });
-            }
-            return supabase.from('expenses').insert(row).then(function (res) {
+            return supabase.from('expenses').upsert(row, { onConflict: 'id' }).then(function (res) {
                 if (res.error) return Promise.reject(new Error(res.error.message));
                 return { success: true, savedId: id };
             });
@@ -5785,14 +5779,28 @@
         }
 
         function addOnePeriod(dateStr, freq) {
-            var d = new Date(dateStr);
-            if (freq === 'Daily') d.setDate(d.getDate() + 1);
-            else if (freq === 'Weekly') d.setDate(d.getDate() + 7);
-            else if (freq === 'Monthly') d.setMonth(d.getMonth() + 1);
-            else if (freq === 'Semi-Annually') d.setMonth(d.getMonth() + 6);
-            else if (freq === 'Annually') d.setFullYear(d.getFullYear() + 1);
-            else return dateStr;
-            return d.toISOString().split('T')[0];
+            if (!dateStr) return dateStr;
+            var parts = String(dateStr).split('-').map(Number);
+            if (parts.length !== 3 || isNaN(parts[0])) return dateStr;
+            var y = parts[0], m = parts[1] - 1, d = parts[2];
+            var dt;
+            if (freq === 'Daily') {
+                dt = new Date(Date.UTC(y, m, d + 1));
+            } else if (freq === 'Weekly') {
+                dt = new Date(Date.UTC(y, m, d + 7));
+            } else if (freq === 'Monthly' || freq === 'Semi-Annually' || freq === 'Annually') {
+                var monthsToAdd = freq === 'Monthly' ? 1 : (freq === 'Semi-Annually' ? 6 : 12);
+                var targetMonth = m + monthsToAdd;
+                var testDate = new Date(Date.UTC(y, targetMonth, d));
+                // Clamp to last day of target month if day overflowed (e.g. Jan 31 -> Feb 28)
+                if (testDate.getUTCMonth() !== ((targetMonth % 12) + 12) % 12) {
+                    testDate = new Date(Date.UTC(y, targetMonth + 1, 0));
+                }
+                dt = testDate;
+            } else {
+                return dateStr;
+            }
+            return dt.toISOString().split('T')[0];
         }
 
         var currentCreateOnceSchedule = null;
@@ -5800,7 +5808,10 @@
             var r = appData.scheduled.find(function (x) { return x[0] === id; });
             if (!r) return showToast("Schedule not found", 'error');
             currentCreateOnceSchedule = r;
-            document.getElementById('createOnceDate').value = r[2] || new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            const defaultDate = (r[2] && r[2] <= todayStr) ? r[2] : todayStr;
+            document.getElementById('createOnceDate').value = defaultDate;
             document.getElementById('createOnceModal').classList.remove('hidden');
         }
         function closeCreateOnceModal() {
@@ -5821,14 +5832,13 @@
                     fetchInitialDataFromSupabase().then(function (data) { onDataLoad(JSON.stringify(data)); });
                 }).catch(function (e) { showToast(e && e.message ? e.message : 'Failed', 'error'); });
             } else {
-                var s = appData.schema;
-                appData.expenses.push([txnId, dateStr, r[4] || 'Expense', r[5] || '', r[6] || '', Number(r[7]) || 0, r[8] || 'Cashless', r[9] || '', (r[10] || '') + ' (from schedule) [Schedule: ' + r[0] + ']']);
-                appData.expenses.sort(function (a, b) { return b[s.date].localeCompare(a[s.date]); });
-                buildSearchIndex(); calculateLiveBalances();
-                closeCreateOnceModal();
-                renderScheduledTable();
-                if (typeof renderReportTable === 'function') renderReportTable(false);
-                showToast("One-off transaction created.");
+                google.script.run.withSuccessHandler(function () {
+                    closeCreateOnceModal();
+                    showToast("One-off transaction created.");
+                    google.script.run.withSuccessHandler(onDataLoad).getInitialData();
+                }).withFailureHandler(function (e) {
+                    showToast(e && e.message ? e.message : 'Failed', 'error');
+                }).saveTransaction(payload);
             }
         }
 
@@ -5859,8 +5869,8 @@
         // --- AUTO PROCESS SCHEDULER ---
         async function autoProcessSchedules() {
             try {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const now = new Date();
+                const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
                 let processedCount = 0;
                 let schedules = appData.scheduled || [];
@@ -5868,22 +5878,18 @@
                 for (let i = 0; i < schedules.length; i++) {
                     let r = schedules[i];
                     let firstStartStr = r[11] || r[2];
-                    let firstStart = firstStartStr ? new Date(firstStartStr) : null;
-                    if (firstStart) firstStart.setHours(0, 0, 0, 0);
-
                     let nextDueStr = r[2];
-                    let n = new Date(nextDueStr);
-                    n.setHours(0, 0, 0, 0);
+                    let endStr = r[3] || null;
 
-                    let end = r[3] ? new Date(r[3]) : null;
-                    if (end) end.setHours(0, 0, 0, 0);
+                    if (firstStartStr && todayStr < firstStartStr) continue; // Not started yet!
+                    if (endStr && todayStr > endStr) continue; // Expired
 
-                    if (firstStart && today < firstStart) continue; // Not started yet!
-                    if (end && today > end) continue; // Expired
+                    let currentDue = nextDueStr;
+                    let scheduleUpdated = false;
+                    let safetyLimit = 24;
 
-                    if (today >= n) {
-                        // Time to run!
-                        let txnDate = nextDueStr; // n formatted as YYYY-MM-DD
+                    while (currentDue && todayStr >= currentDue && (!endStr || currentDue <= endStr) && safetyLimit-- > 0) {
+                        let txnDate = currentDue;
                         let txnId = 'TXN-SCH-' + r[0] + '-' + txnDate;
                         let payload = {
                             transactionId: txnId,
@@ -5897,24 +5903,32 @@
                             remarks: (r[10] || '') + ' (Auto) [Schedule: ' + r[0] + ']'
                         };
 
-                        // Save Transaction
+                        // Save Transaction to Supabase (upsert ensures row is inserted and idempotent)
                         await saveTransactionToSupabase(payload);
 
                         // Update Schedule Next Due Date
                         if (r[1] === 'One-Time') {
-                            let yesterday = new Date(today);
+                            let yesterday = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
                             yesterday.setDate(yesterday.getDate() - 1);
                             r[3] = yesterday.toISOString().split('T')[0];
+                            scheduleUpdated = true;
+                            processedCount++;
+                            break;
                         } else {
-                            let newDate = addOnePeriod(nextDueStr, r[1]);
-                            r[2] = newDate;
+                            let nextDate = addOnePeriod(currentDue, r[1]);
+                            if (!nextDate || nextDate === currentDue) break;
+                            currentDue = nextDate;
+                            r[2] = currentDue;
+                            scheduleUpdated = true;
+                            processedCount++;
                         }
+                    }
 
-                        // Save Schedule Update
+                    if (scheduleUpdated) {
                         let schedulePayload = {
                             scheduleId: r[0],
                             frequency: r[1],
-                            firstStartDate: r[11] || r[2],
+                            firstStartDate: firstStartStr,
                             startDate: r[2],
                             endDate: r[3],
                             type: r[4],
@@ -5927,13 +5941,11 @@
                         };
 
                         await saveScheduleToSupabase(schedulePayload);
-                        processedCount++;
                     }
                 }
 
                 if (processedCount > 0) {
-                    // Silent refresh
-                    console.log(`Auto-processed ${processedCount} schedules.`);
+                    console.log(`Auto-processed ${processedCount} schedule occurrences.`);
                     const data = await fetchInitialDataFromSupabase();
                     onDataLoad(JSON.stringify(data));
                 }
@@ -5943,11 +5955,13 @@
             }
         }
 
-        async function triggerManualSchedule() {
-            var btn = event.target;
-            var originalText = btn.innerText;
-            btn.innerText = "Processing...";
-            btn.disabled = true;
+        async function triggerManualSchedule(e) {
+            var btn = (e && e.currentTarget) || (typeof event !== 'undefined' && event && (event.currentTarget || (event.target && event.target.closest('button')) || event.target));
+            var originalHtml = btn ? btn.innerHTML : '<i data-feather="play" class="w-3 h-3"></i> Run';
+            if (btn) {
+                btn.innerText = "Processing...";
+                btn.disabled = true;
+            }
 
             if (useSupabase()) {
                 try {
@@ -5957,18 +5971,31 @@
                     console.error(e);
                     showToast("Error processing schedules: " + e.message, "error");
                 } finally {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    if (btn) {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        safeFeatherReplace();
+                    }
                 }
             } else {
                 google.script.run.withSuccessHandler(function () {
                     showToast("Schedule check complete!");
                     renderScheduledTable();
                     if (typeof renderReportTable === 'function') renderReportTable(false);
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    if (btn) {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        safeFeatherReplace();
+                    }
                     // Refresh data to see new transactions
                     google.script.run.withSuccessHandler(onDataLoad).getInitialData();
+                }).withFailureHandler(function (err) {
+                    showToast("Error: " + (err && err.message ? err.message : 'Failed'), "error");
+                    if (btn) {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        safeFeatherReplace();
+                    }
                 }).processRecurringTransactions();
             }
         }

@@ -346,8 +346,11 @@ function saveTransaction(f) {
     if (f.transactionId) {
       const fin = es.createTextFinder(id).matchEntireCell(true);
       const r = fin.findNext();
-      if (r) es.getRange(r.getRow(), 1, 1, 9).setValues([row]);
-      else throw new Error("ID not found");
+      if (r) {
+        es.getRange(r.getRow(), 1, 1, 9).setValues([row]);
+      } else {
+        es.appendRow(row);
+      }
     } else {
       es.appendRow(row);
     }
